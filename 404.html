@@ -78,7 +78,30 @@
         window.location = href;
     }
 
+    const handleReactUrl() {
+        if (!/app\.html/.test(href)) {
+            return;
+        }
+
+        // If a custome domain is not set for the repo,
+        //  set the segmentCount to 1.
+        var segmentCount = 0;
+
+        var l = window.location;
+
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.splite('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' +
+            l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
+            l.hash
+        );
+    }
+
     var href = window.location.href;
+
+    handleReactUrl();
+
     var lang = href.split('/').slice(3).find(function(language) { return all_languages.indexOf(language.toLowerCase()) > -1 }) || getCookieItem('language');
     if (lang && all_languages.indexOf(lang.toLowerCase()) > -1) {
         redirect();
