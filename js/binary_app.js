@@ -3228,6 +3228,16 @@ var initApp = function initApp() {
     }
 };
 
+var getBasename = function getBasename() {
+    var basename = /(\/\w{2}\/app\.html).*/.exec(window.location.pathname);
+
+    if (basename && basename.length) {
+        return basename[1];
+    }
+
+    return '/';
+};
+
 // TODO
 // const onUnload = () => {
 //     stores.trade.dispose();
@@ -3237,7 +3247,7 @@ var initApp = function initApp() {
 var BinaryApp = function BinaryApp() {
     return _react2.default.createElement(
         _reactRouterDom.BrowserRouter,
-        { basename: window.location.pathname + '/' },
+        { basename: getBasename() },
         _react2.default.createElement(
             _connect.MobxProvider,
             { store: stores },
