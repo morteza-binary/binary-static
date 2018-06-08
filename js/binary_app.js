@@ -3237,7 +3237,7 @@ var initApp = function initApp() {
 var BinaryApp = function BinaryApp() {
     return _react2.default.createElement(
         _reactRouterDom.BrowserRouter,
-        { basename: '/en/app.html/' },
+        { basename: window.location.pathname + '/' },
         _react2.default.createElement(
             _connect.MobxProvider,
             { store: stores },
