@@ -620,7 +620,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-var routes = [{ path: '/', component: _trade_app2.default, exact: false }, { path: '/statement', component: _statement2.default, is_authenticated: true }];
+var routes = [{ path: '/', component: _trade_app2.default, exact: true }, { path: '/statement', component: _statement2.default, is_authenticated: true }];
 
 var RouteWithSubRoutes = function RouteWithSubRoutes(route) {
     return _react2.default.createElement(_reactRouterDom.Route, {
