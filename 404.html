@@ -89,6 +89,7 @@
 
         var l = window.location;
 
+
         l.replace(
             l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
             l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '?p=/' +
@@ -96,13 +97,12 @@
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
             l.hash
         );
-        console.log('-----------------------');
     }
 
     var href = window.location.href;
 
     handleReactUrl();
-/*
+    
     var lang = href.split('/').slice(3).find(function(language) { return all_languages.indexOf(language.toLowerCase()) > -1 }) || getCookieItem('language');
     if (lang && all_languages.indexOf(lang.toLowerCase()) > -1) {
         redirect();
@@ -122,7 +122,6 @@
             }
         };
     }
-*/
     </script>
 </head>
 <body>
