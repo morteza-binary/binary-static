@@ -80,7 +80,7 @@
 
     function handleReactUrl() {
         if (!/app\.html/.test(href)) {
-            return;
+            return false;
         }
 
         // If a custome domain is not set for the repo,
@@ -97,30 +97,33 @@
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
             l.hash
         );
+
+        return true;
     }
 
     var href = window.location.href;
 
-    handleReactUrl();
-    
-    var lang = href.split('/').slice(3).find(function(language) { return all_languages.indexOf(language.toLowerCase()) > -1 }) || getCookieItem('language');
-    if (lang && all_languages.indexOf(lang.toLowerCase()) > -1) {
-        redirect();
-    } else {
-        var ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1');
-        ws.onopen = function(e) {
-            ws.send(JSON.stringify({'website_status': '1'}));
-        };
-        ws.onmessage = function(msg) {
-            var response = JSON.parse(msg.data);
-            if(response.msg_type === 'website_status') {
-                if(!response.error && response.hasOwnProperty('website_status')) {
-                    lang = getLanguage(response.website_status.clients_country);
+    if (!handleReactUrl()) {
+
+        var lang = href.split('/').slice(3).find(function(language) { return all_languages.indexOf(language.toLowerCase()) > -1 }) || getCookieItem('language');
+        if (lang && all_languages.indexOf(lang.toLowerCase()) > -1) {
+            redirect();
+        } else {
+            var ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1');
+            ws.onopen = function(e) {
+                ws.send(JSON.stringify({'website_status': '1'}));
+            };
+            ws.onmessage = function(msg) {
+                var response = JSON.parse(msg.data);
+                if(response.msg_type === 'website_status') {
+                    if(!response.error && response.hasOwnProperty('website_status')) {
+                        lang = getLanguage(response.website_status.clients_country);
+                    }
+                    ws.close();
+                    redirect();
                 }
-                ws.close();
-                redirect();
-            }
-        };
+            };
+        }
     }
     </script>
 </head>
