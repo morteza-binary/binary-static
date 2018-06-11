@@ -918,7 +918,7 @@ if (!Element.prototype.matches) {
 
 /***/ }),
 
-/***/ 15:
+/***/ 14:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3202,19 +3202,21 @@ var _client_base = __webpack_require__(24);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
+var _language = __webpack_require__(14);
+
 var _localize = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // configure({ enforceActions: true }); // disabled for SmartCharts compatibility
 
-// import { configure }            from 'mobx';
 var stores = {
     client: new _client_store2.default(),
     main: new _main_store2.default(),
     trade: new _trade_store2.default(),
     ui: new _ui_store2.default()
-};
+}; // import { configure }              from 'mobx';
+
 
 var initApp = function initApp() {
     _client_base2.default.init();
@@ -3228,14 +3230,20 @@ var initApp = function initApp() {
     }
 };
 
+/*
+ * Retrieves basename from current url
+ * 
+ * @return {string} returns the basename of current url
+ */
 var getBasename = function getBasename() {
-    var basename = /(\/\w{2}\/app\.html).*/.exec(window.location.pathname);
+    var regexString = '((' + Object.keys((0, _language.getAll)()).join('|') + ')/app.html).*';
+    var basename = new RegExp(regexString, 'ig').exec(window.location.pathname);
 
     if (basename && basename.length) {
         return basename[1];
     }
 
-    return '/';
+    return '/en/app.html';
 };
 
 // TODO
@@ -4997,7 +5005,7 @@ exports.default = LanguageSwitcher;
 
 
 var Client = __webpack_require__(24);
-var getLanguage = __webpack_require__(15).get;
+var getLanguage = __webpack_require__(14).get;
 var isStorageSupported = __webpack_require__(5).isStorageSupported;
 var getAppId = __webpack_require__(34).getAppId;
 
@@ -9161,7 +9169,7 @@ exports.default = Loading;
 "use strict";
 
 
-var getLanguage = __webpack_require__(15).get;
+var getLanguage = __webpack_require__(14).get;
 var localize = __webpack_require__(2).localize;
 var State = __webpack_require__(5).State;
 var getPropertyValue = __webpack_require__(1).getPropertyValue;
@@ -9291,7 +9299,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var ClientBase = __webpack_require__(24);
 var SocketCache = __webpack_require__(47);
-var getLanguage = __webpack_require__(15).get;
+var getLanguage = __webpack_require__(14).get;
 var State = __webpack_require__(5).State;
 var cloneObject = __webpack_require__(1).cloneObject;
 var getPropertyValue = __webpack_require__(1).getPropertyValue;
@@ -10025,7 +10033,7 @@ var Login = __webpack_require__(38);
 var BinarySocket = __webpack_require__(46);
 var getElementById = __webpack_require__(3).getElementById;
 var isVisible = __webpack_require__(3).isVisible;
-var getLanguage = __webpack_require__(15).get;
+var getLanguage = __webpack_require__(14).get;
 var State = __webpack_require__(5).State;
 var getAppId = __webpack_require__(34).getAppId;
 
@@ -10347,8 +10355,8 @@ exports.default = DAO;
 "use strict";
 
 
-var urlForLanguage = __webpack_require__(15).urlFor;
-var urlLang = __webpack_require__(15).urlLang;
+var urlForLanguage = __webpack_require__(14).urlFor;
+var urlLang = __webpack_require__(14).urlLang;
 var createElement = __webpack_require__(1).createElement;
 var isEmptyObject = __webpack_require__(1).isEmptyObject;
 __webpack_require__(270);
@@ -10612,7 +10620,7 @@ var _dao = __webpack_require__(75);
 
 var _dao2 = _interopRequireDefault(_dao);
 
-var _language = __webpack_require__(15);
+var _language = __webpack_require__(14);
 
 var _localize = __webpack_require__(2);
 

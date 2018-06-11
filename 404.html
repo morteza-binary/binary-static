@@ -78,18 +78,29 @@
         window.location = href;
     }
 
+    /**
+     * A helper function to add suport of HTML5 routing to gh-pages
+     * @return {boolean} if window.location.href doesn't contain app.html it will returns false immediately
+     */
     function handleReactUrl() {
-        if (!/app\.html/.test(href)) {
+
+        // if the url is not related to new app, returns false.
+        const langRegexString = `(${Object.keys(langs).join('|')})\/app\.html`;
+
+        if (!new RegExp(langRegexString).test(href)) {
             return false;
         }
 
-        // If a custome domain is not set for the repo,
-        //  set the segmentCount to 1.
+        // Since there are two sub entries after CNAME URL for the app 'www.binary.com/en/app.html'
+        // the value of segmentCount should be 2.
         var segmentCount = 2;
 
         var l = window.location;
 
 
+        // Converting the path and query strings into just query strings and
+        // then redirects the browser to the new url with only query strings and hash fragment.
+        // https://www.binary.com/en/app.html/statement -> https://www.binary.com/en/app.html?p=/statement
         l.replace(
             l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
             l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '?p=/' +
