@@ -922,17 +922,18 @@ hr {
       .drawer-container .drawer-bg .drawer .drawer-item {
         position: relative;
         width: 100%;
-        padding: 14px 16px;
         cursor: pointer;
         font-size: 0.875rem;
         /* stylelint-disable-line number-max-precision */
         -webkit-box-sizing: border-box;
                 box-sizing: border-box;
+        line-height: 48px;
         z-index: 1; }
         .drawer-container .drawer-bg .drawer .drawer-item span.parent-item {
           font-weight: 300;
           cursor: pointer;
-          padding-left: 1.5rem; }
+          padding-left: 3rem;
+          line-height: 1.5rem; }
           .drawer-container .drawer-bg .drawer .drawer-item span.parent-item:before {
             content: '\25A2';
             font-size: 1rem;
@@ -978,16 +979,16 @@ hr {
                     transform: none; }
         .drawer-container .drawer-bg .drawer .drawer-item a {
           text-decoration: none;
-          font-weight: 300; }
+          font-weight: 300;
+          display: block;
+          padding-left: 1rem;
+          line-height: 3rem; }
           .drawer-container .drawer-bg .drawer .drawer-item a span {
             padding-left: 1.5rem;
             color: #2a3052; }
           .drawer-container .drawer-bg .drawer .drawer-item a:before {
             content: '\25A2';
-            color: #2a3052;
-            font-size: 1rem;
-            position: absolute;
-            top: -4px; }
+            color: #2a3052; }
         .drawer-container .drawer-bg .drawer .drawer-item:hover {
           background: #f2f2f2; }
       .drawer-container .drawer-bg .drawer.visible {
