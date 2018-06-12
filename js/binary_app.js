@@ -8,7 +8,7 @@ webpackJsonp([3],{
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var extend = __webpack_require__(180);
+var extend = __webpack_require__(181);
 __webpack_require__(139);
 
 /**
@@ -600,7 +600,7 @@ var _propTypes = __webpack_require__(10);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -608,7 +608,7 @@ var _login = __webpack_require__(38);
 
 var _localize = __webpack_require__(2);
 
-var _trade_app = __webpack_require__(415);
+var _trade_app = __webpack_require__(416);
 
 var _trade_app2 = _interopRequireDefault(_trade_app);
 
@@ -1035,6 +1035,59 @@ module.exports = Language;
 
 
 Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.toGMTFormat = exports.convertToUnix = undefined;
+
+var _moment = __webpack_require__(8);
+
+var _moment2 = _interopRequireDefault(_moment);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Convert epoch to moment object
+ * @param  {Number} epoch
+ * @return {moment} the moment object of provided epoch
+ */
+var toMoment = function toMoment(epoch) {
+  return _moment2.default.unix(epoch).utc();
+};
+
+/**
+ * Set specified time on moment object
+ * @param  {moment} moment_obj  the moment to set the time on
+ * @param  {String} time        12 hours format
+ * @return {moment} a new moment object of result
+ */
+var setTime = function setTime(moment_obj, time) {
+  return _moment2.default.utc(moment_obj.format('L') + ' ' + time, 'L LT') // TODO: use 24 hours format once there is a new design for time_picker
+  ;
+};
+
+/**
+ * return the unix value of provided epoch and time
+ * @param  {Number} epoch  the date to update with provided time
+ * @param  {String} time   the time to set on the date
+ * @return {Number} unix value of the result
+ */
+var convertToUnix = exports.convertToUnix = function convertToUnix(epoch, time) {
+  return setTime(toMoment(epoch), time).unix();
+};
+
+var toGMTFormat = exports.toGMTFormat = function toGMTFormat(time) {
+  return (0, _moment2.default)(time || undefined).utc().format('YYYY-MM-DD HH:mm:ss [GMT]');
+};
+
+/***/ }),
+
+/***/ 154:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
@@ -1242,39 +1295,349 @@ module.exports = Localize;
 
 /***/ }),
 
-/***/ 212:
+/***/ 20:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.toGMTFormat = exports.convertDateTimetoUnix = exports.momentDateTime = undefined;
+var moment = __webpack_require__(8);
+var isCryptocurrency = __webpack_require__(45).isCryptocurrency;
+var SocketCache = __webpack_require__(47);
+var LocalStore = __webpack_require__(5).LocalStore;
+var State = __webpack_require__(5).State;
+var getPropertyValue = __webpack_require__(1).getPropertyValue;
+var isEmptyObject = __webpack_require__(1).isEmptyObject;
 
-var _moment = __webpack_require__(8);
+var ClientBase = function () {
+    var storage_key = 'client.accounts';
+    var client_object = {};
+    var current_loginid = void 0;
 
-var _moment2 = _interopRequireDefault(_moment);
+    var init = function init() {
+        current_loginid = LocalStore.get('active_loginid');
+        client_object = getAllAccountsObject();
+    };
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+    var isLoggedIn = function isLoggedIn() {
+        return !isEmptyObject(getAllAccountsObject()) && get('loginid') && get('token');
+    };
 
-var momentDateTime = exports.momentDateTime = function momentDateTime(date, time) {
-    var moment_date = _moment2.default.utc(date);
-    var arr_time = ((time.split(' ') || [])[0] || '').split(':');
-    if (arr_time.length > 1) {
-        moment_date.hour(arr_time[0]).minute(arr_time[1]);
-    }
-    return moment_date.utc();
-};
+    var isValidLoginid = function isValidLoginid() {
+        if (!isLoggedIn()) return true;
+        var valid_login_ids = new RegExp('^(MX|MF|VRTC|MLT|CR|FOG)[0-9]+$', 'i');
+        return getAllLoginids().every(function (loginid) {
+            return valid_login_ids.test(loginid);
+        });
+    };
 
-var convertDateTimetoUnix = exports.convertDateTimetoUnix = function convertDateTimetoUnix(date, time) {
-    return momentDateTime(date, time).unix();
-};
+    /**
+     * Stores the client information in local variable and localStorage
+     *
+     * @param {String} key                 The property name to set
+     * @param {String|Number|Object} value The regarding value
+     * @param {String|null} loginid        The account to set the value for
+     */
+    var set = function set(key, value) {
+        var loginid = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : current_loginid;
 
-var toGMTFormat = exports.toGMTFormat = function toGMTFormat(time) {
-    return (0, _moment2.default)(time || undefined).utc().format('YYYY-MM-DD HH:mm:ss [GMT]');
-};
+        if (key === 'loginid' && value !== current_loginid) {
+            LocalStore.set('active_loginid', value);
+            current_loginid = value;
+        } else {
+            if (!(loginid in client_object)) {
+                client_object[loginid] = {};
+            }
+            client_object[loginid][key] = value;
+            LocalStore.setObject(storage_key, client_object);
+        }
+    };
+
+    /**
+     * Returns the client information
+     *
+     * @param {String|null} key     The property name to return the value from, if missing returns the account object
+     * @param {String|null} loginid The account to return the value from
+     */
+    var get = function get(key) {
+        var loginid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : current_loginid;
+
+        var value = void 0;
+        if (key === 'loginid') {
+            value = loginid || LocalStore.get('active_loginid');
+        } else {
+            var current_client = client_object[loginid] || getAllAccountsObject()[loginid] || client_object;
+
+            value = key ? current_client[key] : current_client;
+        }
+        if (!Array.isArray(value) && (+value === 1 || +value === 0 || value === 'true' || value === 'false')) {
+            value = JSON.parse(value || false);
+        }
+        return value;
+    };
+
+    var getAllAccountsObject = function getAllAccountsObject() {
+        return LocalStore.getObject(storage_key);
+    };
+
+    var getAllLoginids = function getAllLoginids() {
+        return Object.keys(getAllAccountsObject());
+    };
+
+    var getAccountType = function getAccountType() {
+        var loginid = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : current_loginid;
+
+        var account_type = void 0;
+        if (/^VR/.test(loginid)) account_type = 'virtual';else if (/^MF/.test(loginid)) account_type = 'financial';else if (/^MLT/.test(loginid)) account_type = 'gaming';
+        return account_type;
+    };
+
+    var isAccountOfType = function isAccountOfType(type) {
+        var loginid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : current_loginid;
+        var only_enabled = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        var this_type = getAccountType(loginid);
+        return (type === 'virtual' && this_type === 'virtual' || type === 'real' && this_type !== 'virtual' || type === this_type) && (only_enabled ? !get('is_disabled', loginid) : true);
+    };
+
+    var getAccountOfType = function getAccountOfType(type, only_enabled) {
+        var id = getAllLoginids().find(function (loginid) {
+            return isAccountOfType(type, loginid, only_enabled);
+        });
+        return id ? Object.assign({ loginid: id }, get(null, id)) : {};
+    };
+
+    var hasAccountType = function hasAccountType(type, only_enabled) {
+        return !isEmptyObject(getAccountOfType(type, only_enabled));
+    };
+
+    // only considers currency of real money accounts
+    // @param {String} type = crypto|fiat
+    var hasCurrencyType = function hasCurrencyType(type) {
+        var loginids = getAllLoginids();
+        if (type === 'crypto') {
+            // find if has crypto currency account
+            return loginids.find(function (loginid) {
+                return !get('is_virtual', loginid) && isCryptocurrency(get('currency', loginid));
+            });
+        }
+        // else find if have fiat currency account
+        return loginids.find(function (loginid) {
+            return !get('is_virtual', loginid) && !isCryptocurrency(get('currency', loginid));
+        });
+    };
+
+    var types_map = {
+        virtual: 'Virtual',
+        gaming: 'Gaming',
+        financial: 'Investment'
+    };
+
+    var getAccountTitle = function getAccountTitle(loginid) {
+        return types_map[getAccountType(loginid)] || 'Real';
+    };
+
+    var responseAuthorize = function responseAuthorize(response) {
+        var authorize = response.authorize;
+        set('email', authorize.email);
+        set('currency', authorize.currency);
+        set('is_virtual', +authorize.is_virtual);
+        set('session_start', parseInt(moment().valueOf() / 1000));
+        set('landing_company_shortcode', authorize.landing_company_name);
+        updateAccountList(authorize.account_list);
+    };
+
+    var updateAccountList = function updateAccountList(account_list) {
+        account_list.forEach(function (account) {
+            set('excluded_until', account.excluded_until || '', account.loginid);
+            Object.keys(account).forEach(function (param) {
+                var param_to_set = param === 'country' ? 'residence' : param;
+                var value_to_set = typeof account[param] === 'undefined' ? '' : account[param];
+                if (param_to_set !== 'loginid') {
+                    set(param_to_set, value_to_set, account.loginid);
+                }
+            });
+        });
+    };
+
+    var shouldAcceptTnc = function shouldAcceptTnc() {
+        if (get('is_virtual')) return false;
+        var website_tnc_version = State.getResponse('website_status.terms_conditions_version');
+        var client_tnc_status = State.getResponse('get_settings.client_tnc_status');
+        return typeof client_tnc_status !== 'undefined' && client_tnc_status !== website_tnc_version;
+    };
+
+    var clearAllAccounts = function clearAllAccounts() {
+        current_loginid = undefined;
+        client_object = {};
+        LocalStore.setObject(storage_key, client_object);
+    };
+
+    var setNewAccount = function setNewAccount(options) {
+        if (!options.email || !options.loginid || !options.token) {
+            return false;
+        }
+
+        SocketCache.clear();
+        localStorage.setItem('GTM_new_account', '1');
+
+        set('token', options.token, options.loginid);
+        set('email', options.email, options.loginid);
+        set('is_virtual', +options.is_virtual, options.loginid);
+        set('loginid', options.loginid);
+
+        return true;
+    };
+
+    var currentLandingCompany = function currentLandingCompany() {
+        var landing_company_response = State.getResponse('landing_company') || {};
+        var this_shortcode = get('landing_company_shortcode');
+        var landing_company_prop = Object.keys(landing_company_response).find(function (key) {
+            return this_shortcode === landing_company_response[key].shortcode;
+        });
+        return landing_company_response[landing_company_prop] || {};
+    };
+
+    var shouldCompleteTax = function shouldCompleteTax() {
+        return isAccountOfType('financial') && !/crs_tin_information/.test((State.getResponse('get_account_status') || {}).status);
+    };
+
+    var getMT5AccountType = function getMT5AccountType(group) {
+        return group ? group.replace('\\', '_').replace(/_(\d+|master)/, '') : '';
+    }; // remove manager id or master distinction from group
+
+    var getBasicUpgradeInfo = function getBasicUpgradeInfo() {
+        var upgradeable_landing_companies = State.getResponse('authorize.upgradeable_landing_companies');
+
+        var can_open_multi = false;
+        var type = void 0,
+            can_upgrade_to = void 0;
+
+        if ((upgradeable_landing_companies || []).length) {
+            var current_landing_company = get('landing_company_shortcode');
+
+            can_open_multi = upgradeable_landing_companies.indexOf(current_landing_company) !== -1;
+
+            // only show upgrade message to landing companies other than current
+            var canUpgrade = function canUpgrade() {
+                for (var _len = arguments.length, landing_companies = Array(_len), _key = 0; _key < _len; _key++) {
+                    landing_companies[_key] = arguments[_key];
+                }
+
+                return landing_companies.find(function (landing_company) {
+                    return landing_company !== current_landing_company && upgradeable_landing_companies.indexOf(landing_company) !== -1;
+                });
+            };
+
+            can_upgrade_to = canUpgrade('costarica', 'iom', 'malta', 'maltainvest', 'japan');
+            if (can_upgrade_to) {
+                type = can_upgrade_to === 'maltainvest' ? 'financial' : 'real';
+            }
+        }
+
+        return {
+            type: type,
+            can_upgrade: !!can_upgrade_to,
+            can_upgrade_to: can_upgrade_to,
+            can_open_multi: can_open_multi
+        };
+    };
+
+    var getLandingCompanyValue = function getLandingCompanyValue(loginid, landing_company, key) {
+        var landing_company_object = void 0;
+        if (loginid.financial || isAccountOfType('financial', loginid)) {
+            landing_company_object = getPropertyValue(landing_company, 'financial_company');
+        } else if (loginid.real || isAccountOfType('real', loginid)) {
+            landing_company_object = getPropertyValue(landing_company, 'gaming_company');
+
+            // handle accounts that don't have gaming company
+            if (!landing_company_object) {
+                landing_company_object = getPropertyValue(landing_company, 'financial_company');
+            }
+        } else {
+            var financial_company = (getPropertyValue(landing_company, 'financial_company') || {})[key] || [];
+            var gaming_company = (getPropertyValue(landing_company, 'gaming_company') || {})[key] || [];
+            landing_company_object = financial_company.concat(gaming_company);
+            return landing_company_object;
+        }
+        return (landing_company_object || {})[key];
+    };
+
+    // API_V3: send a list of accounts the client can transfer to
+    var canTransferFunds = function canTransferFunds(account) {
+        if (account) {
+            // this specific account can be used to transfer funds to
+            return canTransferFundsTo(account.loginid);
+        }
+        // at least one account can be used to transfer funds to
+        return Object.keys(client_object).some(function (loginid) {
+            return canTransferFundsTo(loginid);
+        });
+    };
+
+    var canTransferFundsTo = function canTransferFundsTo(to_loginid) {
+        if (to_loginid === current_loginid || get('is_virtual', to_loginid) || get('is_virtual') || get('is_disabled', to_loginid)) {
+            return false;
+        }
+        var from_currency = get('currency');
+        var to_currency = get('currency', to_loginid);
+        if (!from_currency || !to_currency) {
+            return false;
+        }
+        // only transfer to other accounts that have the same currency as current account if one is maltainvest and one is malta
+        if (from_currency === to_currency) {
+            // these landing companies are allowed to transfer funds to each other if they have the same currency
+            var same_cur_allowed = {
+                maltainvest: 'malta',
+                malta: 'maltainvest'
+            };
+            var from_landing_company = get('landing_company_shortcode');
+            var to_landing_company = get('landing_company_shortcode', to_loginid);
+            // if same_cur_allowed[from_landing_company] is undefined and to_landing_company is also undefined, it will return true
+            // so we should compare '' === undefined instead
+            return (same_cur_allowed[from_landing_company] || '') === to_landing_company;
+        }
+        // or for other clients if current account is cryptocurrency it should only transfer to fiat currencies and vice versa
+        var is_from_crypto = isCryptocurrency(from_currency);
+        var is_to_crypto = isCryptocurrency(to_currency);
+        return is_from_crypto ? !is_to_crypto : is_to_crypto;
+    };
+
+    var hasCostaricaAccount = function hasCostaricaAccount() {
+        return !!getAllLoginids().find(function (loginid) {
+            return (/^CR/.test(loginid)
+            );
+        });
+    };
+
+    return {
+        init: init,
+        isLoggedIn: isLoggedIn,
+        isValidLoginid: isValidLoginid,
+        set: set,
+        get: get,
+        getAllLoginids: getAllLoginids,
+        getAccountType: getAccountType,
+        isAccountOfType: isAccountOfType,
+        getAccountOfType: getAccountOfType,
+        hasAccountType: hasAccountType,
+        hasCurrencyType: hasCurrencyType,
+        getAccountTitle: getAccountTitle,
+        responseAuthorize: responseAuthorize,
+        shouldAcceptTnc: shouldAcceptTnc,
+        clearAllAccounts: clearAllAccounts,
+        setNewAccount: setNewAccount,
+        currentLandingCompany: currentLandingCompany,
+        shouldCompleteTax: shouldCompleteTax,
+        getMT5AccountType: getMT5AccountType,
+        getBasicUpgradeInfo: getBasicUpgradeInfo,
+        getLandingCompanyValue: getLandingCompanyValue,
+        canTransferFunds: canTransferFunds,
+        hasCostaricaAccount: hasCostaricaAccount
+    };
+}();
+
+module.exports = ClientBase;
 
 /***/ }),
 
@@ -1715,12 +2078,12 @@ var Button = function Button(_ref) {
         text = _ref.text,
         has_effect = _ref.has_effect,
         is_disabled = _ref.is_disabled,
-        handleClick = _ref.handleClick;
+        onClick = _ref.onClick;
 
     var classes = 'btn' + (has_effect ? ' effect' : '') + ' ' + className;
     return _react2.default.createElement(
         'button',
-        { id: id, className: classes, onClick: handleClick || undefined, disabled: is_disabled },
+        { id: id, className: classes, onClick: onClick || undefined, disabled: is_disabled },
         _react2.default.createElement(
             'span',
             null,
@@ -1731,10 +2094,10 @@ var Button = function Button(_ref) {
 
 Button.propTypes = {
     className: _propTypes2.default.string,
-    handleClick: _propTypes2.default.func,
     has_effect: _propTypes2.default.bool,
     id: _propTypes2.default.string,
     is_disabled: _propTypes2.default.bool,
+    onClick: _propTypes2.default.func,
     text: _propTypes2.default.string
 };
 
@@ -2601,7 +2964,7 @@ var _react = __webpack_require__(7);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _iscroll = __webpack_require__(649);
+var _iscroll = __webpack_require__(650);
 
 var _iscroll2 = _interopRequireDefault(_iscroll);
 
@@ -2625,6 +2988,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       1. to change to 24 hours format
       2. to handle disabled time period
       3. to handle null as initial value
+      4. update the state only when dropdown closed
 */
 
 var TimePickerDropdown = function (_PureComponent) {
@@ -3212,352 +3576,6 @@ exports.default = FullscreenDialog;
 
 /***/ }),
 
-/***/ 23:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var moment = __webpack_require__(8);
-var isCryptocurrency = __webpack_require__(45).isCryptocurrency;
-var SocketCache = __webpack_require__(47);
-var LocalStore = __webpack_require__(5).LocalStore;
-var State = __webpack_require__(5).State;
-var getPropertyValue = __webpack_require__(1).getPropertyValue;
-var isEmptyObject = __webpack_require__(1).isEmptyObject;
-
-var ClientBase = function () {
-    var storage_key = 'client.accounts';
-    var client_object = {};
-    var current_loginid = void 0;
-
-    var init = function init() {
-        current_loginid = LocalStore.get('active_loginid');
-        client_object = getAllAccountsObject();
-    };
-
-    var isLoggedIn = function isLoggedIn() {
-        return !isEmptyObject(getAllAccountsObject()) && get('loginid') && get('token');
-    };
-
-    var isValidLoginid = function isValidLoginid() {
-        if (!isLoggedIn()) return true;
-        var valid_login_ids = new RegExp('^(MX|MF|VRTC|MLT|CR|FOG)[0-9]+$', 'i');
-        return getAllLoginids().every(function (loginid) {
-            return valid_login_ids.test(loginid);
-        });
-    };
-
-    /**
-     * Stores the client information in local variable and localStorage
-     *
-     * @param {String} key                 The property name to set
-     * @param {String|Number|Object} value The regarding value
-     * @param {String|null} loginid        The account to set the value for
-     */
-    var set = function set(key, value) {
-        var loginid = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : current_loginid;
-
-        if (key === 'loginid' && value !== current_loginid) {
-            LocalStore.set('active_loginid', value);
-            current_loginid = value;
-        } else {
-            if (!(loginid in client_object)) {
-                client_object[loginid] = {};
-            }
-            client_object[loginid][key] = value;
-            LocalStore.setObject(storage_key, client_object);
-        }
-    };
-
-    /**
-     * Returns the client information
-     *
-     * @param {String|null} key     The property name to return the value from, if missing returns the account object
-     * @param {String|null} loginid The account to return the value from
-     */
-    var get = function get(key) {
-        var loginid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : current_loginid;
-
-        var value = void 0;
-        if (key === 'loginid') {
-            value = loginid || LocalStore.get('active_loginid');
-        } else {
-            var current_client = client_object[loginid] || getAllAccountsObject()[loginid] || client_object;
-
-            value = key ? current_client[key] : current_client;
-        }
-        if (!Array.isArray(value) && (+value === 1 || +value === 0 || value === 'true' || value === 'false')) {
-            value = JSON.parse(value || false);
-        }
-        return value;
-    };
-
-    var getAllAccountsObject = function getAllAccountsObject() {
-        return LocalStore.getObject(storage_key);
-    };
-
-    var getAllLoginids = function getAllLoginids() {
-        return Object.keys(getAllAccountsObject());
-    };
-
-    var getAccountType = function getAccountType() {
-        var loginid = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : current_loginid;
-
-        var account_type = void 0;
-        if (/^VR/.test(loginid)) account_type = 'virtual';else if (/^MF/.test(loginid)) account_type = 'financial';else if (/^MLT/.test(loginid)) account_type = 'gaming';
-        return account_type;
-    };
-
-    var isAccountOfType = function isAccountOfType(type) {
-        var loginid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : current_loginid;
-        var only_enabled = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-        var this_type = getAccountType(loginid);
-        return (type === 'virtual' && this_type === 'virtual' || type === 'real' && this_type !== 'virtual' || type === this_type) && (only_enabled ? !get('is_disabled', loginid) : true);
-    };
-
-    var getAccountOfType = function getAccountOfType(type, only_enabled) {
-        var id = getAllLoginids().find(function (loginid) {
-            return isAccountOfType(type, loginid, only_enabled);
-        });
-        return id ? Object.assign({ loginid: id }, get(null, id)) : {};
-    };
-
-    var hasAccountType = function hasAccountType(type, only_enabled) {
-        return !isEmptyObject(getAccountOfType(type, only_enabled));
-    };
-
-    // only considers currency of real money accounts
-    // @param {String} type = crypto|fiat
-    var hasCurrencyType = function hasCurrencyType(type) {
-        var loginids = getAllLoginids();
-        if (type === 'crypto') {
-            // find if has crypto currency account
-            return loginids.find(function (loginid) {
-                return !get('is_virtual', loginid) && isCryptocurrency(get('currency', loginid));
-            });
-        }
-        // else find if have fiat currency account
-        return loginids.find(function (loginid) {
-            return !get('is_virtual', loginid) && !isCryptocurrency(get('currency', loginid));
-        });
-    };
-
-    var types_map = {
-        virtual: 'Virtual',
-        gaming: 'Gaming',
-        financial: 'Investment'
-    };
-
-    var getAccountTitle = function getAccountTitle(loginid) {
-        return types_map[getAccountType(loginid)] || 'Real';
-    };
-
-    var responseAuthorize = function responseAuthorize(response) {
-        var authorize = response.authorize;
-        set('email', authorize.email);
-        set('currency', authorize.currency);
-        set('is_virtual', +authorize.is_virtual);
-        set('session_start', parseInt(moment().valueOf() / 1000));
-        set('landing_company_shortcode', authorize.landing_company_name);
-        updateAccountList(authorize.account_list);
-    };
-
-    var updateAccountList = function updateAccountList(account_list) {
-        account_list.forEach(function (account) {
-            set('excluded_until', account.excluded_until || '', account.loginid);
-            Object.keys(account).forEach(function (param) {
-                var param_to_set = param === 'country' ? 'residence' : param;
-                var value_to_set = typeof account[param] === 'undefined' ? '' : account[param];
-                if (param_to_set !== 'loginid') {
-                    set(param_to_set, value_to_set, account.loginid);
-                }
-            });
-        });
-    };
-
-    var shouldAcceptTnc = function shouldAcceptTnc() {
-        if (get('is_virtual')) return false;
-        var website_tnc_version = State.getResponse('website_status.terms_conditions_version');
-        var client_tnc_status = State.getResponse('get_settings.client_tnc_status');
-        return typeof client_tnc_status !== 'undefined' && client_tnc_status !== website_tnc_version;
-    };
-
-    var clearAllAccounts = function clearAllAccounts() {
-        current_loginid = undefined;
-        client_object = {};
-        LocalStore.setObject(storage_key, client_object);
-    };
-
-    var setNewAccount = function setNewAccount(options) {
-        if (!options.email || !options.loginid || !options.token) {
-            return false;
-        }
-
-        SocketCache.clear();
-        localStorage.setItem('GTM_new_account', '1');
-
-        set('token', options.token, options.loginid);
-        set('email', options.email, options.loginid);
-        set('is_virtual', +options.is_virtual, options.loginid);
-        set('loginid', options.loginid);
-
-        return true;
-    };
-
-    var currentLandingCompany = function currentLandingCompany() {
-        var landing_company_response = State.getResponse('landing_company') || {};
-        var this_shortcode = get('landing_company_shortcode');
-        var landing_company_prop = Object.keys(landing_company_response).find(function (key) {
-            return this_shortcode === landing_company_response[key].shortcode;
-        });
-        return landing_company_response[landing_company_prop] || {};
-    };
-
-    var shouldCompleteTax = function shouldCompleteTax() {
-        return isAccountOfType('financial') && !/crs_tin_information/.test((State.getResponse('get_account_status') || {}).status);
-    };
-
-    var getMT5AccountType = function getMT5AccountType(group) {
-        return group ? group.replace('\\', '_').replace(/_(\d+|master)/, '') : '';
-    }; // remove manager id or master distinction from group
-
-    var getBasicUpgradeInfo = function getBasicUpgradeInfo() {
-        var upgradeable_landing_companies = State.getResponse('authorize.upgradeable_landing_companies');
-
-        var can_open_multi = false;
-        var type = void 0,
-            can_upgrade_to = void 0;
-
-        if ((upgradeable_landing_companies || []).length) {
-            var current_landing_company = get('landing_company_shortcode');
-
-            can_open_multi = upgradeable_landing_companies.indexOf(current_landing_company) !== -1;
-
-            // only show upgrade message to landing companies other than current
-            var canUpgrade = function canUpgrade() {
-                for (var _len = arguments.length, landing_companies = Array(_len), _key = 0; _key < _len; _key++) {
-                    landing_companies[_key] = arguments[_key];
-                }
-
-                return landing_companies.find(function (landing_company) {
-                    return landing_company !== current_landing_company && upgradeable_landing_companies.indexOf(landing_company) !== -1;
-                });
-            };
-
-            can_upgrade_to = canUpgrade('costarica', 'iom', 'malta', 'maltainvest', 'japan');
-            if (can_upgrade_to) {
-                type = can_upgrade_to === 'maltainvest' ? 'financial' : 'real';
-            }
-        }
-
-        return {
-            type: type,
-            can_upgrade: !!can_upgrade_to,
-            can_upgrade_to: can_upgrade_to,
-            can_open_multi: can_open_multi
-        };
-    };
-
-    var getLandingCompanyValue = function getLandingCompanyValue(loginid, landing_company, key) {
-        var landing_company_object = void 0;
-        if (loginid.financial || isAccountOfType('financial', loginid)) {
-            landing_company_object = getPropertyValue(landing_company, 'financial_company');
-        } else if (loginid.real || isAccountOfType('real', loginid)) {
-            landing_company_object = getPropertyValue(landing_company, 'gaming_company');
-
-            // handle accounts that don't have gaming company
-            if (!landing_company_object) {
-                landing_company_object = getPropertyValue(landing_company, 'financial_company');
-            }
-        } else {
-            var financial_company = (getPropertyValue(landing_company, 'financial_company') || {})[key] || [];
-            var gaming_company = (getPropertyValue(landing_company, 'gaming_company') || {})[key] || [];
-            landing_company_object = financial_company.concat(gaming_company);
-            return landing_company_object;
-        }
-        return (landing_company_object || {})[key];
-    };
-
-    // API_V3: send a list of accounts the client can transfer to
-    var canTransferFunds = function canTransferFunds(account) {
-        if (account) {
-            // this specific account can be used to transfer funds to
-            return canTransferFundsTo(account.loginid);
-        }
-        // at least one account can be used to transfer funds to
-        return Object.keys(client_object).some(function (loginid) {
-            return canTransferFundsTo(loginid);
-        });
-    };
-
-    var canTransferFundsTo = function canTransferFundsTo(to_loginid) {
-        if (to_loginid === current_loginid || get('is_virtual', to_loginid) || get('is_virtual') || get('is_disabled', to_loginid)) {
-            return false;
-        }
-        var from_currency = get('currency');
-        var to_currency = get('currency', to_loginid);
-        if (!from_currency || !to_currency) {
-            return false;
-        }
-        // only transfer to other accounts that have the same currency as current account if one is maltainvest and one is malta
-        if (from_currency === to_currency) {
-            // these landing companies are allowed to transfer funds to each other if they have the same currency
-            var same_cur_allowed = {
-                maltainvest: 'malta',
-                malta: 'maltainvest'
-            };
-            var from_landing_company = get('landing_company_shortcode');
-            var to_landing_company = get('landing_company_shortcode', to_loginid);
-            // if same_cur_allowed[from_landing_company] is undefined and to_landing_company is also undefined, it will return true
-            // so we should compare '' === undefined instead
-            return (same_cur_allowed[from_landing_company] || '') === to_landing_company;
-        }
-        // or for other clients if current account is cryptocurrency it should only transfer to fiat currencies and vice versa
-        var is_from_crypto = isCryptocurrency(from_currency);
-        var is_to_crypto = isCryptocurrency(to_currency);
-        return is_from_crypto ? !is_to_crypto : is_to_crypto;
-    };
-
-    var hasCostaricaAccount = function hasCostaricaAccount() {
-        return !!getAllLoginids().find(function (loginid) {
-            return (/^CR/.test(loginid)
-            );
-        });
-    };
-
-    return {
-        init: init,
-        isLoggedIn: isLoggedIn,
-        isValidLoginid: isValidLoginid,
-        set: set,
-        get: get,
-        getAllLoginids: getAllLoginids,
-        getAccountType: getAccountType,
-        isAccountOfType: isAccountOfType,
-        getAccountOfType: getAccountOfType,
-        hasAccountType: hasAccountType,
-        hasCurrencyType: hasCurrencyType,
-        getAccountTitle: getAccountTitle,
-        responseAuthorize: responseAuthorize,
-        shouldAcceptTnc: shouldAcceptTnc,
-        clearAllAccounts: clearAllAccounts,
-        setNewAccount: setNewAccount,
-        currentLandingCompany: currentLandingCompany,
-        shouldCompleteTax: shouldCompleteTax,
-        getMT5AccountType: getMT5AccountType,
-        getBasicUpgradeInfo: getBasicUpgradeInfo,
-        getLandingCompanyValue: getLandingCompanyValue,
-        canTransferFunds: canTransferFunds,
-        hasCostaricaAccount: hasCostaricaAccount
-    };
-}();
-
-module.exports = ClientBase;
-
-/***/ }),
-
 /***/ 26:
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3734,21 +3752,21 @@ var _network_monitor = __webpack_require__(375);
 
 var _network_monitor2 = _interopRequireDefault(_network_monitor);
 
-var _client_store = __webpack_require__(416);
+var _client_store = __webpack_require__(417);
 
 var _client_store2 = _interopRequireDefault(_client_store);
 
+var _common_store = __webpack_require__(418);
+
+var _common_store2 = _interopRequireDefault(_common_store);
+
 var _connect = __webpack_require__(26);
 
-var _main_store = __webpack_require__(417);
-
-var _main_store2 = _interopRequireDefault(_main_store);
-
-var _trade_store = __webpack_require__(418);
+var _trade_store = __webpack_require__(419);
 
 var _trade_store2 = _interopRequireDefault(_trade_store);
 
-var _ui_store = __webpack_require__(419);
+var _ui_store = __webpack_require__(420);
 
 var _ui_store2 = _interopRequireDefault(_ui_store);
 
@@ -3762,7 +3780,7 @@ var _header2 = _interopRequireDefault(_header);
 
 var _routes = __webpack_require__(117);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -3776,7 +3794,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var stores = {
     client: new _client_store2.default(),
-    main: new _main_store2.default(),
+    common: new _common_store2.default(),
     trade: new _trade_store2.default(),
     ui: new _ui_store2.default()
 }; // import { configure }              from 'mobx';
@@ -3809,12 +3827,6 @@ var getBasename = function getBasename() {
 
     return '/en/app.html';
 };
-
-// TODO
-// const onUnload = () => {
-//     stores.trade.dispose();
-//     disposeActions();
-// };
 
 var BinaryApp = function BinaryApp() {
     return _react2.default.createElement(
@@ -4090,11 +4102,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.requestLogout = undefined;
 
-var _dao = __webpack_require__(76);
+var _ws_methods = __webpack_require__(66);
 
-var _dao2 = _interopRequireDefault(_dao);
+var _ws_methods2 = _interopRequireDefault(_ws_methods);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -4107,7 +4119,7 @@ var _storage = __webpack_require__(5);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var requestLogout = exports.requestLogout = function requestLogout() {
-    _dao2.default.sendLogout().then(doLogout);
+    _ws_methods2.default.logout().then(doLogout);
 };
 
 var doLogout = function doLogout(response) {
@@ -4168,11 +4180,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _mobx = __webpack_require__(64);
 
-var _dao = __webpack_require__(76);
+var _ws_methods = __webpack_require__(66);
 
-var _dao2 = _interopRequireDefault(_dao);
+var _ws_methods2 = _interopRequireDefault(_ws_methods);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -4197,7 +4209,7 @@ var _utility = __webpack_require__(1);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var client_store = void 0,
-    main_store = void 0;
+    common_store = void 0;
 
 // TODO: update commented statements to the corresponding functions from app_2
 var BinarySocketGeneral = function () {
@@ -4209,10 +4221,10 @@ var BinarySocketGeneral = function () {
                     _client_base2.default.sendLogoutRequest();
                     return;
                 }
-                _dao2.default.subscribeWebsiteStatus(ResponseHandlers.websiteStatus);
+                _ws_methods2.default.subscribeWebsiteStatus(ResponseHandlers.websiteStatus);
             }
             _server_time2.default.init((0, _mobx.action)('setTime', function () {
-                main_store.server_time = _server_time2.default.get();
+                common_store.server_time = _server_time2.default.get();
             }));
         }
     };
@@ -4235,14 +4247,14 @@ var BinarySocketGeneral = function () {
                     } else {
                         _client_base2.default.responseAuthorize(response);
                         setBalance(response.authorize.balance);
-                        _dao2.default.subscribeBalance(ResponseHandlers.balance);
-                        _dao2.default.getSettings();
-                        _dao2.default.getAccountStatus();
-                        _dao2.default.getPayoutCurrencies();
-                        _dao2.default.getMt5LoginList();
+                        _ws_methods2.default.subscribeBalance(ResponseHandlers.balance);
+                        _ws_methods2.default.getSettings();
+                        _ws_methods2.default.getAccountStatus();
+                        _ws_methods2.default.payoutCurrencies();
+                        _ws_methods2.default.mt5LoginList();
                         setResidence(response.authorize.country || _client_base2.default.get('residence'));
                         if (!_client_base2.default.get('is_virtual')) {
-                            _dao2.default.getSelfExclusion();
+                            _ws_methods2.default.getSelfExclusion();
                         }
                         _socket_base2.default.sendBuffered();
                         if (/bch/i.test(response.authorize.currency) && !_client_base2.default.get('accepted_bch')) {
@@ -4281,7 +4293,7 @@ var BinarySocketGeneral = function () {
     var setResidence = function setResidence(residence) {
         if (residence) {
             _client_base2.default.set('residence', residence);
-            _dao2.default.getLandingCompany(residence);
+            _ws_methods2.default.landingCompany(residence);
         }
     };
 
@@ -4335,7 +4347,7 @@ var BinarySocketGeneral = function () {
 
     var init = function init(store) {
         client_store = store.client;
-        main_store = store.main;
+        common_store = store.common;
 
         return {
             onOpen: onOpen,
@@ -4405,9 +4417,9 @@ var _react = __webpack_require__(7);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _dao = __webpack_require__(76);
+var _ws_methods = __webpack_require__(66);
 
-var _dao2 = _interopRequireDefault(_dao);
+var _ws_methods2 = _interopRequireDefault(_ws_methods);
 
 var _connect = __webpack_require__(26);
 
@@ -4415,11 +4427,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var subscribe = function subscribe(request_object, callback) {
     if (request_object.subscribe !== 1) return;
-    _dao2.default.subscribeTicksHistory(request_object, callback);
+    _ws_methods2.default.subscribeTicksHistory(request_object, callback);
 };
 
 var forget = function forget(match_values, callback) {
-    return _dao2.default.forget('ticks_history', callback, match_values);
+    return _ws_methods2.default.forget('ticks_history', callback, match_values);
 };
 
 var SmartCharts = function SmartCharts(_ref) {
@@ -4432,7 +4444,7 @@ var SmartCharts = function SmartCharts(_ref) {
         _react2.default.createElement(_smartcharts.SmartChart, {
             requestSubscribe: subscribe,
             requestForget: forget,
-            requestAPI: _dao2.default.sendRequest.bind(_dao2.default),
+            requestAPI: _ws_methods2.default.sendRequest.bind(_ws_methods2.default),
             onSymbolChange: function onSymbolChange(symbol_obj) {
                 _onSymbolChange({
                     target: {
@@ -4475,7 +4487,7 @@ var _react = __webpack_require__(7);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -4542,7 +4554,7 @@ var AccountBalance = exports.AccountBalance = (0, _connect.connect)(function (_r
             className: 'primary green',
             has_effect: true,
             text: (0, _localize.localize)('Login'),
-            handleClick: _login.redirectToLogin
+            onClick: _login.redirectToLogin
         })
     );
 });
@@ -4573,7 +4585,7 @@ var _reactPerfectScrollbar = __webpack_require__(267);
 
 var _reactPerfectScrollbar2 = _interopRequireDefault(_reactPerfectScrollbar);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -4624,7 +4636,7 @@ var AccountSwitcher = function (_React$PureComponent) {
         var _this = _possibleConstructorReturn(this, (AccountSwitcher.__proto__ || Object.getPrototypeOf(AccountSwitcher)).call(this, props));
 
         _this.toggleAccountsList = function () {
-            if (_this.accounts_list) {
+            if (_this.state.accounts_list) {
                 _this.setState({
                     is_collapsed: !_this.state.is_collapsed
                 });
@@ -4749,7 +4761,7 @@ exports.default = AccountSwitcher;
 "use strict";
 
 
-var Client = __webpack_require__(23);
+var Client = __webpack_require__(20);
 var getLanguage = __webpack_require__(14).get;
 var isStorageSupported = __webpack_require__(5).isStorageSupported;
 var getAppId = __webpack_require__(34).getAppId;
@@ -5831,7 +5843,7 @@ var _popover = __webpack_require__(387);
 
 var _popover2 = _interopRequireDefault(_popover);
 
-var _date_time = __webpack_require__(212);
+var _date_time = __webpack_require__(153);
 
 var _routes = __webpack_require__(117);
 
@@ -6004,10 +6016,10 @@ TogglePortfolioDrawer.propTypes = {
 };
 
 exports.default = (0, _connect.connect)(function (_ref2) {
-    var main = _ref2.main,
+    var common = _ref2.common,
         ui = _ref2.ui;
     return {
-        server_time: main.server_time,
+        server_time: common.server_time,
         is_portfolio_drawer_on: ui.is_portfolio_drawer_on,
         togglePortfolioDrawer: ui.togglePortfolioDrawer
     };
@@ -6055,7 +6067,7 @@ var _account_balance = __webpack_require__(378);
 
 var _menu_drawer = __webpack_require__(386);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -6419,37 +6431,27 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(7);
+var _classnames = __webpack_require__(61);
 
-var _react2 = _interopRequireDefault(_react);
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _moment = __webpack_require__(8);
 
 var _moment2 = _interopRequireDefault(_moment);
 
-var _classnames = __webpack_require__(61);
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
 var _propTypes = __webpack_require__(10);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _dao = __webpack_require__(76);
+var _react = __webpack_require__(7);
 
-var _dao2 = _interopRequireDefault(_dao);
+var _react2 = _interopRequireDefault(_react);
+
+var _ws_methods = __webpack_require__(66);
+
+var _ws_methods2 = _interopRequireDefault(_ws_methods);
 
 var _connect = __webpack_require__(26);
-
-var _client_base = __webpack_require__(23);
-
-var _client_base2 = _interopRequireDefault(_client_base);
-
-var _currency_base = __webpack_require__(45);
-
-var _localize = __webpack_require__(2);
-
-var _string_util = __webpack_require__(18);
 
 var _card_list = __webpack_require__(381);
 
@@ -6463,7 +6465,17 @@ var _date_picker = __webpack_require__(218);
 
 var _date_picker2 = _interopRequireDefault(_date_picker);
 
-var _loading = __webpack_require__(431);
+var _client_base = __webpack_require__(20);
+
+var _client_base2 = _interopRequireDefault(_client_base);
+
+var _currency_base = __webpack_require__(45);
+
+var _localize = __webpack_require__(2);
+
+var _string_util = __webpack_require__(18);
+
+var _loading = __webpack_require__(432);
 
 var _loading2 = _interopRequireDefault(_loading);
 
@@ -6729,7 +6741,7 @@ var Statement = function (_React$PureComponent) {
                 date_to = _state2.date_to;
 
 
-            _dao2.default.getStatement(this.props.batch_size, this.state.data_source.length, _extends({}, date_from && { date_from: (0, _moment2.default)(date_from).unix() }, date_to && { date_to: (0, _moment2.default)(date_to).add(1, 'd').subtract(1, 's').unix() })).then(function (response) {
+            _ws_methods2.default.statement(this.props.batch_size, this.state.data_source.length, _extends({}, date_from && { date_from: (0, _moment2.default)(date_from).unix() }, date_to && { date_to: (0, _moment2.default)(date_to).add(1, 'd').subtract(1, 's').unix() })).then(function (response) {
                 if (!_this2.el) return;
 
                 var formatted_transactions = response.statement.transactions.map(function (transaction) {
@@ -6882,9 +6894,9 @@ Statement.propTypes = {
 };
 
 exports.default = (0, _connect.connect)(function (_ref2) {
-    var main = _ref2.main;
+    var common = _ref2.common;
     return {
-        server_time: main.server_time
+        server_time: common.server_time
     };
 })(Statement);
 
@@ -6932,9 +6944,9 @@ exports.getCurrenciesAsync = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _dao = __webpack_require__(76);
+var _ws_methods = __webpack_require__(66);
 
-var _dao2 = _interopRequireDefault(_dao);
+var _ws_methods2 = _interopRequireDefault(_ws_methods);
 
 var _currency_base = __webpack_require__(45);
 
@@ -6958,7 +6970,7 @@ var getCurrenciesAsync = exports.getCurrenciesAsync = function () {
                 switch (_context.prev = _context.next) {
                     case 0:
                         _context.next = 2;
-                        return _dao2.default.getPayoutCurrencies();
+                        return _ws_methods2.default.payoutCurrencies();
 
                     case 2:
                         r = _context.sent;
@@ -7155,19 +7167,19 @@ exports.requestProposal = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _date_time = __webpack_require__(153);
+
+var _ws_methods = __webpack_require__(66);
+
+var _ws_methods2 = _interopRequireDefault(_ws_methods);
+
 var _currency_base = __webpack_require__(45);
-
-var _date_time = __webpack_require__(212);
-
-var _dao = __webpack_require__(76);
-
-var _dao2 = _interopRequireDefault(_dao);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var requestProposal = exports.requestProposal = function requestProposal(store, updateStore) {
     var proposal_info = {};
-    _dao2.default.forgetAll('proposal').then(function () {
+    _ws_methods2.default.forgetAll('proposal').then(function () {
         var proposalCallback = function proposalCallback(response) {
             var proposal = response.proposal || {};
             var profit = proposal.payout - proposal.ask_price || 0;
@@ -7175,18 +7187,19 @@ var requestProposal = exports.requestProposal = function requestProposal(store, 
 
             proposal_info[response.echo_req.contract_type] = {
                 profit: profit.toFixed((0, _currency_base.getDecimalPlaces)(store.currency)),
-                returns: returns.toFixed(2),
+                returns: returns.toFixed(2) + '%',
                 stake: proposal.display_value,
                 payout: proposal.payout,
                 id: proposal.id || '',
-                message: proposal.longcode || response.error.message
+                message: proposal.longcode || response.error.message,
+                has_error: !!response.error
             };
 
-            updateStore(store, { proposal_info: proposal_info });
+            updateStore(store, { is_purchase_enabled: true, proposal_info: proposal_info });
         };
 
         Object.keys(store.trade_types).forEach(function (type) {
-            _dao2.default.subscribeProposal(createProposalRequest(store, type), proposalCallback);
+            _ws_methods2.default.subscribeProposal(createProposalRequest(store, type), proposalCallback);
         });
     });
 };
@@ -7200,10 +7213,10 @@ var createProposalRequest = function createProposalRequest(store, type_of_contra
         contract_type: type_of_contract,
         currency: store.currency,
         symbol: store.symbol
-    }, store.start_date && { date_start: (0, _date_time.convertDateTimetoUnix)(store.start_date, store.start_time) }, store.expiry_type === 'duration' ? {
+    }, store.start_date && { date_start: (0, _date_time.convertToUnix)(store.start_date, store.start_time) }, store.expiry_type === 'duration' ? {
         duration: parseInt(store.duration),
         duration_unit: store.duration_unit
-    } : { date_expiry: (0, _date_time.convertDateTimetoUnix)(store.expiry_date, store.expiry_time) }, (store.barrier_count > 0 || store.form_components.indexOf('last_digit') !== -1) && { barrier: store.barrier_1 || store.last_digit }, store.barrier_count === 2 && { barrier2: store.barrier_2 });
+    } : { date_expiry: (0, _date_time.convertToUnix)(store.expiry_date, store.expiry_time) }, (store.barrier_count > 0 || store.form_components.indexOf('last_digit') !== -1) && { barrier: store.barrier_1 || store.last_digit }, store.barrier_count === 2 && { barrier2: store.barrier_2 });
 };
 
 /***/ }),
@@ -7253,13 +7266,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.updateStore = undefined;
 
-var _extend = __webpack_require__(180);
+var _extend = __webpack_require__(181);
 
 var _extend2 = _interopRequireDefault(_extend);
 
 var _mobx = __webpack_require__(64);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -7283,11 +7296,11 @@ var _duration = __webpack_require__(397);
 
 var Duration = _interopRequireWildcard(_duration);
 
-var _start_date = __webpack_require__(403);
+var _start_date = __webpack_require__(404);
 
 var StartDate = _interopRequireWildcard(_start_date);
 
-var _symbol = __webpack_require__(404);
+var _symbol = __webpack_require__(405);
 
 var _Symbol = _interopRequireWildcard(_symbol);
 
@@ -7304,38 +7317,44 @@ var updateStore = exports.updateStore = function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(store) {
         var obj_new_values = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var is_by_user = arguments[2];
+        var new_state;
         return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
                     case 0:
+                        new_state = (0, _utility.cloneObject)(obj_new_values);
+
                         (0, _mobx.runInAction)(function () {
-                            var new_state = (0, _utility.cloneObject)(obj_new_values);
                             Object.keys(new_state).forEach(function (key) {
                                 if (JSON.stringify(store[key]) === JSON.stringify(new_state[key])) {
                                     delete new_state[key];
                                 } else {
+                                    if (key === 'symbol') {
+                                        store.is_purchase_enabled = false;
+                                        store.is_trade_enabled = false;
+                                    }
                                     store[key] = new_state[key];
                                 }
                             });
                         });
 
-                        if (!(is_by_user || /^(symbol|contract_types_list)$/.test(Object.keys(obj_new_values)))) {
+                        if (!(is_by_user || /^(symbol|contract_types_list)$/.test(Object.keys(new_state)))) {
+                            _context.next = 7;
+                            break;
+                        }
+
+                        if (!('symbol' in new_state)) {
                             _context.next = 6;
                             break;
                         }
 
-                        if (!('symbol' in obj_new_values)) {
-                            _context.next = 5;
-                            break;
-                        }
-
-                        _context.next = 5;
-                        return _Symbol.onChangeSymbolAsync(obj_new_values.symbol);
-
-                    case 5:
-                        process(store);
+                        _context.next = 6;
+                        return _Symbol.onChangeSymbolAsync(new_state.symbol);
 
                     case 6:
+                        process(store);
+
+                    case 7:
                     case 'end':
                         return _context.stop();
                 }
@@ -7356,33 +7375,36 @@ var process = function () {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
+                        updateStore(store, { is_purchase_enabled: false, proposal_info: {} }); // disable purchase button(s), clear contract info
+
                         snapshot = (0, _utility.cloneObject)(store);
 
                         if (!(!_client_base2.default.get('currency') && (0, _utility.isEmptyObject)(store.currencies_list))) {
-                            _context2.next = 8;
+                            _context2.next = 9;
                             break;
                         }
 
                         _context2.t0 = extendOrReplace;
                         _context2.t1 = snapshot;
-                        _context2.next = 6;
+                        _context2.next = 7;
                         return Currency.getCurrenciesAsync(store.currency);
 
-                    case 6:
+                    case 7:
                         _context2.t2 = _context2.sent;
                         (0, _context2.t0)(_context2.t1, _context2.t2);
 
-                    case 8:
+                    case 9:
 
                         process_methods.forEach(function (fnc) {
                             extendOrReplace(snapshot, fnc(snapshot));
                         });
 
+                        snapshot.is_trade_enabled = true;
                         updateStore(store, snapshot);
 
                         (0, _proposal.requestProposal)(store, updateStore);
 
-                    case 11:
+                    case 13:
                     case 'end':
                         return _context2.stop();
                 }
@@ -7417,6 +7439,52 @@ var extendOrReplace = function extendOrReplace(source, new_values) {
 
 
 Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.processPurchase = undefined;
+
+var _ws_methods = __webpack_require__(66);
+
+var _ws_methods2 = _interopRequireDefault(_ws_methods);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+var processPurchase = exports.processPurchase = function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(proposal_id, price) {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+                switch (_context.prev = _context.next) {
+                    case 0:
+                        _context.next = 2;
+                        return _ws_methods2.default.buy(proposal_id, price);
+
+                    case 2:
+                        return _context.abrupt('return', _context.sent);
+
+                    case 3:
+                    case 'end':
+                        return _context.stop();
+                }
+            }
+        }, _callee, undefined);
+    }));
+
+    return function processPurchase(_x, _x2) {
+        return _ref.apply(this, arguments);
+    };
+}();
+
+/***/ }),
+
+/***/ 404:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
           value: true
 });
 exports.onChangeStartDate = undefined;
@@ -7443,7 +7511,7 @@ var onChangeStartDate = exports.onChangeStartDate = function onChangeStartDate(_
 
 /***/ }),
 
-/***/ 404:
+/***/ 405:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7486,7 +7554,7 @@ var onChangeSymbolAsync = exports.onChangeSymbolAsync = function () {
 
 /***/ }),
 
-/***/ 405:
+/***/ 406:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7512,13 +7580,13 @@ var _fieldset = __webpack_require__(91);
 
 var _fieldset2 = _interopRequireDefault(_fieldset);
 
-var _input_field = __webpack_require__(153);
+var _input_field = __webpack_require__(154);
 
 var _input_field2 = _interopRequireDefault(_input_field);
 
 var _connect = __webpack_require__(26);
 
-var _client_base = __webpack_require__(23);
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -7621,7 +7689,7 @@ exports.default = (0, _connect.connect)(function (_ref2) {
 
 /***/ }),
 
-/***/ 406:
+/***/ 407:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7643,7 +7711,7 @@ var _fieldset = __webpack_require__(91);
 
 var _fieldset2 = _interopRequireDefault(_fieldset);
 
-var _input_field = __webpack_require__(153);
+var _input_field = __webpack_require__(154);
 
 var _input_field2 = _interopRequireDefault(_input_field);
 
@@ -7729,7 +7797,7 @@ exports.default = (0, _connect.connect)(function (_ref2) {
 
 /***/ }),
 
-/***/ 407:
+/***/ 408:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7749,7 +7817,7 @@ var _propTypes = __webpack_require__(10);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _contracts_popup = __webpack_require__(409);
+var _contracts_popup = __webpack_require__(410);
 
 var _contracts_popup2 = _interopRequireDefault(_contracts_popup);
 
@@ -7790,7 +7858,7 @@ exports.default = (0, _connect.connect)(function (_ref2) {
 
 /***/ }),
 
-/***/ 408:
+/***/ 409:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7824,7 +7892,7 @@ var _fieldset = __webpack_require__(91);
 
 var _fieldset2 = _interopRequireDefault(_fieldset);
 
-var _input_field = __webpack_require__(153);
+var _input_field = __webpack_require__(154);
 
 var _input_field2 = _interopRequireDefault(_input_field);
 
@@ -7956,10 +8024,10 @@ Duration.propTypes = {
 };
 
 exports.default = (0, _connect.connect)(function (_ref2) {
-    var main = _ref2.main,
+    var common = _ref2.common,
         trade = _ref2.trade;
     return {
-        server_time: main.server_time,
+        server_time: common.server_time,
         expiry_type: trade.expiry_type,
         expiry_date: trade.expiry_date,
         expiry_time: trade.expiry_time,
@@ -7972,7 +8040,7 @@ exports.default = (0, _connect.connect)(function (_ref2) {
 
 /***/ }),
 
-/***/ 409:
+/***/ 410:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8207,7 +8275,7 @@ exports.default = ContractsPopUp;
 
 /***/ }),
 
-/***/ 410:
+/***/ 411:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8316,7 +8384,7 @@ exports.default = MobileWidget;
 
 /***/ }),
 
-/***/ 411:
+/***/ 412:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8405,7 +8473,7 @@ exports.default = (0, _connect.connect)(function (_ref2) {
 
 /***/ }),
 
-/***/ 412:
+/***/ 413:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8423,6 +8491,8 @@ var _propTypes = __webpack_require__(10);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
+var _date_time = __webpack_require__(153);
+
 var _button = __webpack_require__(217);
 
 var _button2 = _interopRequireDefault(_button);
@@ -8433,72 +8503,163 @@ var _fieldset2 = _interopRequireDefault(_fieldset);
 
 var _connect = __webpack_require__(26);
 
+var _client_base = __webpack_require__(20);
+
 var _localize = __webpack_require__(2);
+
+var _utility = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// TODO: update/remove this once the design is ready
+var createPurchaseInfo = function createPurchaseInfo(purchase_info) {
+    return _react2.default.createElement(
+        _react2.default.Fragment,
+        null,
+        _react2.default.createElement(
+            'div',
+            null,
+            _react2.default.createElement(
+                'strong',
+                null,
+                'Purchase Info:'
+            )
+        ),
+        _react2.default.createElement(
+            'div',
+            null,
+            'Buy Price: ',
+            purchase_info.buy_price
+        ),
+        _react2.default.createElement(
+            'div',
+            null,
+            'Payout: ',
+            purchase_info.payout
+        ),
+        _react2.default.createElement(
+            'div',
+            null,
+            'Start: ',
+            (0, _date_time.toGMTFormat)(purchase_info.start_time * 1000)
+        ),
+        _react2.default.createElement(
+            'div',
+            null,
+            'Contract ID: ',
+            purchase_info.contract_id
+        ),
+        _react2.default.createElement(
+            'div',
+            null,
+            'Transaction ID: ',
+            purchase_info.transaction_id
+        ),
+        _react2.default.createElement(
+            'div',
+            null,
+            'Description: ',
+            purchase_info.longcode
+        )
+    );
+};
+
 var Purchase = function Purchase(_ref) {
-    var proposal_info = _ref.proposal_info,
+    var is_purchase_enabled = _ref.is_purchase_enabled,
+        is_trade_enabled = _ref.is_trade_enabled,
+        onClickPurchase = _ref.onClickPurchase,
+        proposal_info = _ref.proposal_info,
+        purchase_info = _ref.purchase_info,
         trade_types = _ref.trade_types;
     return Object.keys(trade_types).map(function (type, idx) {
         var info = proposal_info[type] || {};
+        var is_logged_in = (0, _client_base.isLoggedIn)();
+
         return _react2.default.createElement(
             _fieldset2.default,
             { key: idx, header: type, tooltip: info.message },
-            _react2.default.createElement(
+            !(0, _utility.isEmptyObject)(purchase_info) && purchase_info.echo_req.buy === info.id ? _react2.default.createElement(
                 'div',
                 null,
-                (0, _localize.localize)('Return'),
-                ': ',
-                info.returns,
-                '%'
-            ),
-            _react2.default.createElement(
-                'div',
+                (0, _utility.getPropertyValue)(purchase_info, ['error', 'message']) || createPurchaseInfo(purchase_info.buy)
+            ) : _react2.default.createElement(
+                _react2.default.Fragment,
                 null,
-                (0, _localize.localize)('Stake'),
-                ': ',
-                info.stake
-            ),
-            _react2.default.createElement(
-                'div',
-                null,
-                (0, _localize.localize)('Net Profit'),
-                ': ',
-                info.profit
-            ),
-            _react2.default.createElement(
-                'div',
-                null,
-                (0, _localize.localize)('Payout'),
-                ': ',
-                info.payout
-            ),
-            _react2.default.createElement(_button2.default, {
-                id: 'purchase_' + type,
-                className: 'primary green',
-                has_effect: true,
-                text: (0, _localize.localize)('Purchase') + ' ' + trade_types[type]
-            })
+                info.has_error || !info.id ? _react2.default.createElement(
+                    'div',
+                    null,
+                    info.message
+                ) : _react2.default.createElement(
+                    _react2.default.Fragment,
+                    null,
+                    _react2.default.createElement(
+                        'div',
+                        null,
+                        (0, _localize.localize)('Return'),
+                        ': ',
+                        info.returns
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        null,
+                        (0, _localize.localize)('Stake'),
+                        ': ',
+                        info.stake
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        null,
+                        (0, _localize.localize)('Net Profit'),
+                        ': ',
+                        info.profit
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        null,
+                        (0, _localize.localize)('Payout'),
+                        ': ',
+                        info.payout
+                    )
+                ),
+                _react2.default.createElement(_button2.default, {
+                    is_disabled: !is_purchase_enabled || !is_trade_enabled || !info.id || !is_logged_in,
+                    id: 'purchase_' + type,
+                    className: 'primary green',
+                    has_effect: true,
+                    text: is_logged_in ? (0, _localize.localize)('Purchase') + ' ' + trade_types[type] : (0, _localize.localize)('Please log in.'),
+                    onClick: function onClick() {
+                        onClickPurchase(info.id, info.stake);
+                    }
+                })
+            )
         );
     });
 };
 
 Purchase.propTypes = {
+    is_purchase_enabled: _propTypes2.default.bool,
+    is_trade_enabled: _propTypes2.default.bool,
+    onClickPurchase: _propTypes2.default.func,
+    proposal_info: _propTypes2.default.object,
+    purchase_info: _propTypes2.default.object,
     trade_types: _propTypes2.default.object
 };
 
 exports.default = (0, _connect.connect)(function (_ref2) {
     var trade = _ref2.trade;
     return {
-        trade_types: trade.trade_types,
-        proposal_info: trade.proposal_info
+        is_purchase_enabled: trade.is_purchase_enabled,
+        is_trade_enabled: trade.is_trade_enabled,
+        onClickPurchase: trade.onPurchase,
+        proposal_info: trade.proposal_info,
+        purchase_info: trade.purchase_info,
+        trade_types: trade.trade_types
     };
 })(Purchase);
 
 /***/ }),
 
-/***/ 413:
+/***/ 414:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8604,7 +8765,7 @@ exports.default = (0, _connect.connect)(function (_ref2) {
 
 /***/ }),
 
-/***/ 414:
+/***/ 415:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8713,7 +8874,7 @@ exports.default = (0, _connect.connect)(function (_ref4) {
 
 /***/ }),
 
-/***/ 415:
+/***/ 416:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8733,39 +8894,39 @@ var _propTypes = __webpack_require__(10);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _amount = __webpack_require__(405);
+var _amount = __webpack_require__(406);
 
 var _amount2 = _interopRequireDefault(_amount);
 
-var _barrier = __webpack_require__(406);
+var _barrier = __webpack_require__(407);
 
 var _barrier2 = _interopRequireDefault(_barrier);
 
-var _contract_type = __webpack_require__(407);
+var _contract_type = __webpack_require__(408);
 
 var _contract_type2 = _interopRequireDefault(_contract_type);
 
-var _duration = __webpack_require__(408);
+var _duration = __webpack_require__(409);
 
 var _duration2 = _interopRequireDefault(_duration);
 
-var _mobile_widget = __webpack_require__(410);
+var _mobile_widget = __webpack_require__(411);
 
 var _mobile_widget2 = _interopRequireDefault(_mobile_widget);
 
-var _last_digit = __webpack_require__(411);
+var _last_digit = __webpack_require__(412);
 
 var _last_digit2 = _interopRequireDefault(_last_digit);
 
-var _purchase = __webpack_require__(412);
+var _purchase = __webpack_require__(413);
 
 var _purchase2 = _interopRequireDefault(_purchase);
 
-var _start_date = __webpack_require__(413);
+var _start_date = __webpack_require__(414);
 
 var _start_date2 = _interopRequireDefault(_start_date);
 
-var _test = __webpack_require__(414);
+var _test = __webpack_require__(415);
 
 var _test2 = _interopRequireDefault(_test);
 
@@ -8804,8 +8965,8 @@ var TradeApp = function (_React$PureComponent) {
             return this.props.form_components.includes(component_name);
         }
     }, {
-        key: 'renderParamPickers',
-        value: function renderParamPickers() {
+        key: 'renderFormComponents',
+        value: function renderFormComponents() {
             var _this2 = this;
 
             return form_components.filter(function (_ref) {
@@ -8831,13 +8992,13 @@ var TradeApp = function (_React$PureComponent) {
                 ),
                 _react2.default.createElement(
                     'div',
-                    { className: 'sidebar-container desktop-only' },
+                    { className: 'sidebar-container desktop-only', style: this.props.is_trade_enabled ? {} : { backgroundColor: '#e9e9e9' } },
                     _react2.default.createElement(
                         'fieldset',
                         { className: 'trade-types' },
                         _react2.default.createElement(_contract_type2.default, { className: 'desktop-only' })
                     ),
-                    this.renderParamPickers(),
+                    this.renderFormComponents(),
                     _react2.default.createElement(_purchase2.default, null)
                 ),
                 _react2.default.createElement(_contract_type2.default, { className: 'mobile-only', is_mobile_widget: true }),
@@ -8847,7 +9008,7 @@ var TradeApp = function (_React$PureComponent) {
                     _react2.default.createElement(
                         _mobile_widget2.default,
                         null,
-                        this.renderParamPickers()
+                        this.renderFormComponents()
                     )
                 ),
                 _react2.default.createElement(
@@ -8869,17 +9030,21 @@ var TradeApp = function (_React$PureComponent) {
 TradeApp.propTypes = {
     form_components: _propTypes2.default.array,
     is_portfolio_drawer_on: _propTypes2.default.bool,
+    is_purchase_enabled: _propTypes2.default.bool,
+    is_trade_enabled: _propTypes2.default.bool,
     portfolios: _propTypes2.default.array,
     server_time: _propTypes2.default.object,
     togglePortfolioDrawer: _propTypes2.default.func
 };
 
 exports.default = (0, _connect.connect)(function (_ref3) {
-    var main = _ref3.main,
+    var common = _ref3.common,
         trade = _ref3.trade,
         ui = _ref3.ui;
     return {
-        server_time: main.server_time,
+        server_time: common.server_time,
+        is_purchase_enabled: trade.is_purchase_enabled,
+        is_trade_enabled: trade.is_trade_enabled,
         form_components: trade.form_components,
         portfolios: trade.portfolios,
         is_portfolio_drawer_on: ui.is_portfolio_drawer_on,
@@ -8889,7 +9054,7 @@ exports.default = (0, _connect.connect)(function (_ref3) {
 
 /***/ }),
 
-/***/ 416:
+/***/ 417:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8962,7 +9127,7 @@ exports.default = ClientStore;
 
 /***/ }),
 
-/***/ 417:
+/***/ 418:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9028,8 +9193,8 @@ function _initializerWarningHelper(descriptor, context) {
     throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
-var MainStore = (_class = function MainStore() {
-    _classCallCheck(this, MainStore);
+var CommonStore = (_class = function CommonStore() {
+    _classCallCheck(this, CommonStore);
 
     _initDefineProp(this, 'server_time', _descriptor, this);
 }, (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'server_time', [_mobx.observable], {
@@ -9038,12 +9203,12 @@ var MainStore = (_class = function MainStore() {
         return _moment2.default.utc();
     }
 })), _class);
-exports.default = MainStore;
+exports.default = CommonStore;
 ;
 
 /***/ }),
 
-/***/ 418:
+/***/ 419:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9056,7 +9221,7 @@ exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _dec, _dec2, _dec3, _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15, _descriptor16, _descriptor17, _descriptor18, _descriptor19, _descriptor20, _descriptor21, _descriptor22, _descriptor23, _descriptor24, _descriptor25, _descriptor26, _descriptor27;
+var _dec, _dec2, _dec3, _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15, _descriptor16, _descriptor17, _descriptor18, _descriptor19, _descriptor20, _descriptor21, _descriptor22, _descriptor23, _descriptor24, _descriptor25, _descriptor26, _descriptor27, _descriptor28, _descriptor29, _descriptor30;
 
 var _mobx = __webpack_require__(64);
 
@@ -9066,7 +9231,9 @@ var _contract_type2 = _interopRequireDefault(_contract_type);
 
 var _index = __webpack_require__(402);
 
-var _client_base = __webpack_require__(23);
+var _purchase = __webpack_require__(403);
+
+var _client_base = __webpack_require__(20);
 
 var _client_base2 = _interopRequireDefault(_client_base);
 
@@ -9123,61 +9290,65 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     function TradeStore() {
         _classCallCheck(this, TradeStore);
 
-        this.time_interval = undefined;
+        _initDefineProp(this, 'is_purchase_enabled', _descriptor, this);
 
-        _initDefineProp(this, 'symbol', _descriptor, this);
+        _initDefineProp(this, 'is_trade_enabled', _descriptor2, this);
 
-        _initDefineProp(this, 'contract_expiry_type', _descriptor2, this);
+        _initDefineProp(this, 'symbol', _descriptor3, this);
 
-        _initDefineProp(this, 'contract_start_type', _descriptor3, this);
+        _initDefineProp(this, 'contract_expiry_type', _descriptor4, this);
 
-        _initDefineProp(this, 'contract_type', _descriptor4, this);
+        _initDefineProp(this, 'contract_start_type', _descriptor5, this);
 
-        _initDefineProp(this, 'contract_types_list', _descriptor5, this);
+        _initDefineProp(this, 'contract_type', _descriptor6, this);
 
-        _initDefineProp(this, 'form_components', _descriptor6, this);
+        _initDefineProp(this, 'contract_types_list', _descriptor7, this);
 
-        _initDefineProp(this, 'trade_types', _descriptor7, this);
+        _initDefineProp(this, 'form_components', _descriptor8, this);
 
-        _initDefineProp(this, 'amount', _descriptor8, this);
+        _initDefineProp(this, 'trade_types', _descriptor9, this);
 
-        _initDefineProp(this, 'basis', _descriptor9, this);
+        _initDefineProp(this, 'amount', _descriptor10, this);
 
-        _initDefineProp(this, 'basis_list', _descriptor10, this);
+        _initDefineProp(this, 'basis', _descriptor11, this);
 
-        _initDefineProp(this, 'currencies_list', _descriptor11, this);
+        _initDefineProp(this, 'basis_list', _descriptor12, this);
 
-        _initDefineProp(this, 'currency', _descriptor12, this);
+        _initDefineProp(this, 'currencies_list', _descriptor13, this);
 
-        _initDefineProp(this, 'duration', _descriptor13, this);
+        _initDefineProp(this, 'currency', _descriptor14, this);
 
-        _initDefineProp(this, 'duration_unit', _descriptor14, this);
+        _initDefineProp(this, 'duration', _descriptor15, this);
 
-        _initDefineProp(this, 'duration_units_list', _descriptor15, this);
+        _initDefineProp(this, 'duration_unit', _descriptor16, this);
 
-        _initDefineProp(this, 'expiry_date', _descriptor16, this);
+        _initDefineProp(this, 'duration_units_list', _descriptor17, this);
 
-        _initDefineProp(this, 'expiry_time', _descriptor17, this);
+        _initDefineProp(this, 'expiry_date', _descriptor18, this);
 
-        _initDefineProp(this, 'expiry_type', _descriptor18, this);
+        _initDefineProp(this, 'expiry_time', _descriptor19, this);
 
-        _initDefineProp(this, 'barrier_1', _descriptor19, this);
+        _initDefineProp(this, 'expiry_type', _descriptor20, this);
 
-        _initDefineProp(this, 'barrier_2', _descriptor20, this);
+        _initDefineProp(this, 'barrier_1', _descriptor21, this);
 
-        _initDefineProp(this, 'barrier_count', _descriptor21, this);
+        _initDefineProp(this, 'barrier_2', _descriptor22, this);
 
-        _initDefineProp(this, 'start_date', _descriptor22, this);
+        _initDefineProp(this, 'barrier_count', _descriptor23, this);
 
-        _initDefineProp(this, 'start_dates_list', _descriptor23, this);
+        _initDefineProp(this, 'start_date', _descriptor24, this);
 
-        _initDefineProp(this, 'start_time', _descriptor24, this);
+        _initDefineProp(this, 'start_dates_list', _descriptor25, this);
 
-        _initDefineProp(this, 'last_digit', _descriptor25, this);
+        _initDefineProp(this, 'start_time', _descriptor26, this);
 
-        _initDefineProp(this, 'proposal_info', _descriptor26, this);
+        _initDefineProp(this, 'last_digit', _descriptor27, this);
 
-        _initDefineProp(this, 'portfolios', _descriptor27, this);
+        _initDefineProp(this, 'proposal_info', _descriptor28, this);
+
+        _initDefineProp(this, 'purchase_info', _descriptor29, this);
+
+        _initDefineProp(this, 'portfolios', _descriptor30, this);
     }
 
     _createClass(TradeStore, [{
@@ -9192,12 +9363,6 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
             }
         }
     }, {
-        key: 'dispose',
-        value: function dispose() {
-            clearInterval(this.time_interval);
-            this.time_interval = undefined;
-        }
-    }, {
         key: 'handleChange',
         value: function handleChange(e) {
             var _e$target = e.target,
@@ -9210,6 +9375,20 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
             }
             (0, _index.updateStore)(this, _defineProperty({}, name, type === 'number' ? +value : value), true);
         }
+    }, {
+        key: 'onPurchase',
+        value: function onPurchase(proposal_id, price) {
+            var _this2 = this;
+
+            if (proposal_id) {
+                (0, _purchase.processPurchase)(proposal_id, price).then((0, _mobx.action)(function (response) {
+                    (0, _index.updateStore)(_this2, { purchase_info: response });
+                }));
+            }
+        }
+
+        // Control values
+
 
         // Underlying
 
@@ -9241,135 +9420,150 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     }]);
 
     return TradeStore;
-}(), (_applyDecoratedDescriptor(_class.prototype, 'init', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'init'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'dispose', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'dispose'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'handleChange', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'handleChange'), _class.prototype), _descriptor = _applyDecoratedDescriptor(_class.prototype, 'symbol', [_mobx.observable], {
+}(), (_applyDecoratedDescriptor(_class.prototype, 'init', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'init'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'handleChange', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'handleChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onPurchase', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'onPurchase'), _class.prototype), _descriptor = _applyDecoratedDescriptor(_class.prototype, 'is_purchase_enabled', [_mobx.observable], {
+    enumerable: true,
+    initializer: function initializer() {
+        return false;
+    }
+}), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, 'is_trade_enabled', [_mobx.observable], {
+    enumerable: true,
+    initializer: function initializer() {
+        return false;
+    }
+}), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, 'symbol', [_mobx.observable], {
     enumerable: true,
     initializer: null
-}), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, 'contract_expiry_type', [_mobx.observable], {
+}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, 'contract_expiry_type', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, 'contract_start_type', [_mobx.observable], {
+}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'contract_start_type', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, 'contract_type', [_mobx.observable], {
+}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'contract_type', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'contract_types_list', [_mobx.observable], {
+}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'contract_types_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'form_components', [_mobx.observable], {
+}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'form_components', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'trade_types', [_mobx.observable], {
+}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, 'trade_types', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'amount', [_mobx.observable], {
+}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, 'amount', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 10;
     }
-}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, 'basis', [_mobx.observable], {
+}), _descriptor11 = _applyDecoratedDescriptor(_class.prototype, 'basis', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, 'basis_list', [_mobx.observable], {
+}), _descriptor12 = _applyDecoratedDescriptor(_class.prototype, 'basis_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor11 = _applyDecoratedDescriptor(_class.prototype, 'currencies_list', [_mobx.observable], {
+}), _descriptor13 = _applyDecoratedDescriptor(_class.prototype, 'currencies_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor12 = _applyDecoratedDescriptor(_class.prototype, 'currency', [_mobx.observable], {
+}), _descriptor14 = _applyDecoratedDescriptor(_class.prototype, 'currency', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return _client_base2.default.get('currency');
     }
-}), _descriptor13 = _applyDecoratedDescriptor(_class.prototype, 'duration', [_mobx.observable], {
+}), _descriptor15 = _applyDecoratedDescriptor(_class.prototype, 'duration', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 5;
     }
-}), _descriptor14 = _applyDecoratedDescriptor(_class.prototype, 'duration_unit', [_mobx.observable], {
+}), _descriptor16 = _applyDecoratedDescriptor(_class.prototype, 'duration_unit', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor15 = _applyDecoratedDescriptor(_class.prototype, 'duration_units_list', [_mobx.observable], {
+}), _descriptor17 = _applyDecoratedDescriptor(_class.prototype, 'duration_units_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor16 = _applyDecoratedDescriptor(_class.prototype, 'expiry_date', [_mobx.observable], {
+}), _descriptor18 = _applyDecoratedDescriptor(_class.prototype, 'expiry_date', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor17 = _applyDecoratedDescriptor(_class.prototype, 'expiry_time', [_mobx.observable], {
+}), _descriptor19 = _applyDecoratedDescriptor(_class.prototype, 'expiry_time', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '09:40 pm';
     }
-}), _descriptor18 = _applyDecoratedDescriptor(_class.prototype, 'expiry_type', [_mobx.observable], {
+}), _descriptor20 = _applyDecoratedDescriptor(_class.prototype, 'expiry_type', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 'duration';
     }
-}), _descriptor19 = _applyDecoratedDescriptor(_class.prototype, 'barrier_1', [_mobx.observable], {
+}), _descriptor21 = _applyDecoratedDescriptor(_class.prototype, 'barrier_1', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor20 = _applyDecoratedDescriptor(_class.prototype, 'barrier_2', [_mobx.observable], {
+}), _descriptor22 = _applyDecoratedDescriptor(_class.prototype, 'barrier_2', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor21 = _applyDecoratedDescriptor(_class.prototype, 'barrier_count', [_mobx.observable], {
+}), _descriptor23 = _applyDecoratedDescriptor(_class.prototype, 'barrier_count', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 0;
     }
-}), _descriptor22 = _applyDecoratedDescriptor(_class.prototype, 'start_date', [_mobx.observable], {
+}), _descriptor24 = _applyDecoratedDescriptor(_class.prototype, 'start_date', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return Number(0);
     }
-}), _descriptor23 = _applyDecoratedDescriptor(_class.prototype, 'start_dates_list', [_mobx.observable], {
+}), _descriptor25 = _applyDecoratedDescriptor(_class.prototype, 'start_dates_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor24 = _applyDecoratedDescriptor(_class.prototype, 'start_time', [_mobx.observable], {
+}), _descriptor26 = _applyDecoratedDescriptor(_class.prototype, 'start_time', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '12:30 am';
     }
-}), _descriptor25 = _applyDecoratedDescriptor(_class.prototype, 'last_digit', [_mobx.observable], {
+}), _descriptor27 = _applyDecoratedDescriptor(_class.prototype, 'last_digit', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 3;
     }
-}), _descriptor26 = _applyDecoratedDescriptor(_class.prototype, 'proposal_info', [_mobx.observable], {
+}), _descriptor28 = _applyDecoratedDescriptor(_class.prototype, 'proposal_info', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor27 = _applyDecoratedDescriptor(_class.prototype, 'portfolios', [_mobx.observable], {
+}), _descriptor29 = _applyDecoratedDescriptor(_class.prototype, 'purchase_info', [_mobx.observable], {
+    enumerable: true,
+    initializer: function initializer() {
+        return {};
+    }
+}), _descriptor30 = _applyDecoratedDescriptor(_class.prototype, 'portfolios', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [{
@@ -9402,7 +9596,7 @@ exports.default = TradeStore;
 
 /***/ }),
 
-/***/ 419:
+/***/ 420:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9511,7 +9705,7 @@ exports.default = UIStore;
 
 /***/ }),
 
-/***/ 431:
+/***/ 432:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9676,7 +9870,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ClientBase = __webpack_require__(23);
+var ClientBase = __webpack_require__(20);
 var SocketCache = __webpack_require__(47);
 var getLanguage = __webpack_require__(14).get;
 var State = __webpack_require__(5).State;
@@ -10407,7 +10601,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var Cookies = __webpack_require__(44);
 var moment = __webpack_require__(8);
-var ClientBase = __webpack_require__(23);
+var ClientBase = __webpack_require__(20);
 var Login = __webpack_require__(38);
 var BinarySocket = __webpack_require__(46);
 var getElementById = __webpack_require__(3).getElementById;
@@ -10584,14 +10778,7 @@ module.exports = GTM;
 
 /***/ }),
 
-/***/ 683:
-/***/ (function(module, exports) {
-
-module.exports = CIQ;
-
-/***/ }),
-
-/***/ 76:
+/***/ 66:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10615,29 +10802,21 @@ var _utility = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DAO = function () {
-    var getAccountStatus = function getAccountStatus() {
-        return _socket_base2.default.send({ get_account_status: 1 });
-    };
-
-    var getActiveSymbols = function getActiveSymbols() {
+var WS = function () {
+    var activeSymbols = function activeSymbols() {
         return _socket_base2.default.send({ active_symbols: 'brief' });
     };
 
-    var getContractsFor = function getContractsFor(symbol) {
+    var buy = function buy(proposal_id, price) {
+        return _socket_base2.default.send({ buy: proposal_id, price: price });
+    };
+
+    var contractsFor = function contractsFor(symbol) {
         return _socket_base2.default.send({ contracts_for: symbol });
     };
 
-    var getLandingCompany = function getLandingCompany(residence) {
-        return _socket_base2.default.send({ landing_company: residence });
-    };
-
-    var getMt5LoginList = function getMt5LoginList() {
-        return _socket_base2.default.send({ mt5_login_list: 1 });
-    };
-
-    var getPayoutCurrencies = function getPayoutCurrencies() {
-        return _socket_base2.default.send({ payout_currencies: 1 });
+    var getAccountStatus = function getAccountStatus() {
+        return _socket_base2.default.send({ get_account_status: 1 });
     };
 
     var getSelfExclusion = function getSelfExclusion() {
@@ -10648,24 +10827,39 @@ var DAO = function () {
         return _socket_base2.default.send({ get_settings: 1 });
     };
 
-    var getWebsiteStatus = function getWebsiteStatus() {
-        return _socket_base2.default.send({ website_status: 1 });
+    var landingCompany = function landingCompany(residence) {
+        return _socket_base2.default.send({ landing_company: residence });
     };
 
-    var sendLogout = function sendLogout() {
+    var logout = function logout() {
         return _socket_base2.default.send({ logout: 1 });
     };
 
-    var getStatement = function getStatement(limit, offset, date_boundaries) {
-        return _socket_base2.default.send(_extends({
-            statement: 1,
-            description: 1,
-            limit: limit,
-            offset: offset
-        }, date_boundaries));
+    var mt5LoginList = function mt5LoginList() {
+        return _socket_base2.default.send({ mt5_login_list: 1 });
+    };
+
+    var payoutCurrencies = function payoutCurrencies() {
+        return _socket_base2.default.send({ payout_currencies: 1 });
+    };
+
+    var sendRequest = function sendRequest(request_object) {
+        return Promise.resolve(!(0, _utility.isEmptyObject)(request_object) ? _socket_base2.default.send(request_object) : {});
+    };
+
+    var statement = function statement(limit, offset, date_boundaries) {
+        return _socket_base2.default.send(_extends({ statement: 1, description: 1, limit: limit, offset: offset }, date_boundaries));
     };
 
     // ----- Streaming calls -----
+    var forget = function forget(msg_type, cb, match_values) {
+        return _subscription_manager2.default.forget(msg_type, cb, match_values);
+    };
+
+    var forgetAll = function forgetAll() {
+        return _subscription_manager2.default.forgetAll.apply(_subscription_manager2.default, arguments);
+    };
+
     var subscribeBalance = function subscribeBalance(cb) {
         return _subscription_manager2.default.subscribe('balance', { balance: 1, subscribe: 1 }, cb);
     };
@@ -10678,53 +10872,47 @@ var DAO = function () {
         return _subscription_manager2.default.subscribe('ticks', { ticks: symbol, subscribe: 1 }, cb, should_forget_first);
     };
 
-    var subscribeWebsiteStatus = function subscribeWebsiteStatus(cb) {
-        return _subscription_manager2.default.subscribe('website_status', { website_status: 1, subscribe: 1 }, cb);
-    };
-
-    var forget = function forget(msg_type, cb, match_values) {
-        return _subscription_manager2.default.forget(msg_type, cb, match_values);
-    };
-
-    var forgetAll = function forgetAll() {
-        return _subscription_manager2.default.forgetAll.apply(_subscription_manager2.default, arguments);
-    };
-
-    // ------ SmartCharts calls ----
     var subscribeTicksHistory = function subscribeTicksHistory(request_object, cb, should_forget_first) {
         return _subscription_manager2.default.subscribe('ticks_history', request_object, cb, should_forget_first);
     };
 
-    var sendRequest = function sendRequest(request_object) {
-        return Promise.resolve(!(0, _utility.isEmptyObject)(request_object) ? _socket_base2.default.send(request_object) : {});
+    var subscribeWebsiteStatus = function subscribeWebsiteStatus(cb) {
+        return _subscription_manager2.default.subscribe('website_status', { website_status: 1, subscribe: 1 }, cb);
     };
 
     return {
+        activeSymbols: activeSymbols,
+        buy: buy,
+        contractsFor: contractsFor,
         getAccountStatus: getAccountStatus,
-        getActiveSymbols: getActiveSymbols,
-        getContractsFor: getContractsFor,
-        getLandingCompany: getLandingCompany,
-        getMt5LoginList: getMt5LoginList,
-        getPayoutCurrencies: getPayoutCurrencies,
         getSelfExclusion: getSelfExclusion,
         getSettings: getSettings,
-        getWebsiteStatus: getWebsiteStatus,
-        getStatement: getStatement,
-        sendLogout: sendLogout,
+        landingCompany: landingCompany,
+        logout: logout,
+        mt5LoginList: mt5LoginList,
+        payoutCurrencies: payoutCurrencies,
+        sendRequest: sendRequest,
+        statement: statement,
 
         // streams
-        sendRequest: sendRequest,
+        forget: forget,
+        forgetAll: forgetAll,
         subscribeBalance: subscribeBalance,
         subscribeProposal: subscribeProposal,
         subscribeTicks: subscribeTicks,
         subscribeTicksHistory: subscribeTicksHistory,
-        subscribeWebsiteStatus: subscribeWebsiteStatus,
-        forget: forget,
-        forgetAll: forgetAll
+        subscribeWebsiteStatus: subscribeWebsiteStatus
     };
 }();
 
-exports.default = DAO;
+exports.default = WS;
+
+/***/ }),
+
+/***/ 684:
+/***/ (function(module, exports) {
+
+module.exports = CIQ;
 
 /***/ }),
 
@@ -10995,9 +11183,9 @@ var _duration = __webpack_require__(399);
 
 var _start_date = __webpack_require__(401);
 
-var _dao = __webpack_require__(76);
+var _ws_methods = __webpack_require__(66);
 
-var _dao2 = _interopRequireDefault(_dao);
+var _ws_methods2 = _interopRequireDefault(_ws_methods);
 
 var _language = __webpack_require__(14);
 
@@ -11041,7 +11229,7 @@ var ContractType = function () {
     var available_categories = {};
 
     var buildContractTypesConfig = function buildContractTypesConfig(symbol) {
-        return _dao2.default.getContractsFor(symbol).then(function (r) {
+        return _ws_methods2.default.contractsFor(symbol).then(function (r) {
             available_contract_types = {};
             available_categories = (0, _utility.cloneObject)(contract_categories); // To preserve the order (will clean the extra items later in this function)
             r.contracts_for.available.forEach(function (contract) {
@@ -11093,10 +11281,10 @@ var ContractType = function () {
                             ],
                         },
                     },
-                    forward_starting_dates: [
-                        { text: 'Mon - 19 Mar, 2018', open: 1517356800, close: 1517443199 },
-                        { text: 'Tue - 20 Mar, 2018', open: 1517443200, close: 1517529599 },
-                        { text: 'Wed - 21 Mar, 2018', open: 1517529600, close: 1517615999 },
+                    forward_starting_dates: [ // value is 'open'
+                        { text: 'Mon - 19 Mar, 2018', value: 1517356800, close: 1517443199 },
+                        { text: 'Tue - 20 Mar, 2018', value: 1517443200, close: 1517529599 },
+                        { text: 'Wed - 21 Mar, 2018', value: 1517529600, close: 1517615999 },
                     ],
                     trade_types: {
                         'CALL': 'Higher',
@@ -11131,9 +11319,9 @@ var ContractType = function () {
                 // set config values
                 config.has_spot = contract.start_type === 'spot';
                 config.durations = (0, _duration.buildDurationConfig)(contract, config.durations);
-                config.forward_starting_dates = (0, _start_date.buildForwardStartingConfig)(contract.forward_starting_options);
                 config.trade_types = buildTradeTypesConfig(contract, config.trade_types);
                 config.barriers = (0, _barrier.buildBarriersConfig)(contract, config.barriers);
+                config.forward_starting_dates = (0, _start_date.buildForwardStartingConfig)(contract.forward_starting_options) || config.forward_starting_dates;
 
                 available_contract_types[type].config = config;
             });
@@ -11165,12 +11353,13 @@ var ContractType = function () {
         var contract_expiry_type = store.contract_expiry_type,
             contract_type = store.contract_type,
             basis = store.basis,
-            duration_unit = store.duration_unit;
+            duration_unit = store.duration_unit,
+            start_date = store.start_date;
 
         var form_components = getComponents(contract_type);
         var obj_basis = getBasis(contract_type, basis);
         var obj_trade_types = getTradeTypes(contract_type);
-        var obj_start_dates = getStartDates(contract_type);
+        var obj_start_dates = getStartDates(contract_type, start_date);
         var obj_start_type = getStartType(obj_start_dates.start_date);
         var obj_barrier = getBarriers(contract_type, contract_expiry_type);
         var obj_duration_unit = getDurationUnit(duration_unit, contract_type, obj_start_type.contract_start_type);
@@ -11227,7 +11416,7 @@ var ContractType = function () {
         };
     };
 
-    var getStartDates = function getStartDates(contract_type) {
+    var getStartDates = function getStartDates(contract_type, current_start_date) {
         var config = (0, _utility.getPropertyValue)(available_contract_types, [contract_type, 'config']);
         var start_dates_list = [];
 
@@ -11239,7 +11428,9 @@ var ContractType = function () {
             start_dates_list.push.apply(start_dates_list, _toConsumableArray(config.forward_starting_dates));
         }
 
-        var start_date = start_dates_list[0].value;
+        var start_date = start_dates_list.find(function (item) {
+            return item.value === current_start_date;
+        }) ? current_start_date : start_dates_list[0].value;
 
         return { start_date: start_date, start_dates_list: start_dates_list };
     };
