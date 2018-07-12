@@ -104,6 +104,9 @@
 .affiliates-signup-page .faq-box, .ib-signup-page .faq-box {
   padding: 1rem; }
 
+.affiliates-signup-page .table-container.center-text th, .affiliates-signup-page .table-container.center-text td, .ib-signup-page .table-container.center-text th, .ib-signup-page .table-container.center-text td {
+  text-align: center; }
+
 @media screen and (max-width: 480px) {
   .affiliates-signup-page table, .affiliates-signup-page .mobile-text-small, .ib-signup-page table, .ib-signup-page .mobile-text-small {
     font-size: 0.9rem; } }
@@ -797,6 +800,23 @@ div.kineticjs-content {
   .open-positions img.responsive {
     width: 40%; } }
 
+.payment-methods__reference {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  background-size: cover;
+  vertical-align: middle; }
+  .payment-methods__reference:not(:last-child) {
+    margin-right: 5px; }
+  .payment-methods__reference-pdf {
+    background-image: url("../images/common/reference/pdf.svg"); }
+    .payment-methods__reference-pdf.payment-methods__reference--disabled {
+      background-image: url("../images/common/reference/pdf_disabled.svg"); }
+  .payment-methods__reference-video {
+    background-image: url("../images/common/reference/youtube.svg"); }
+    .payment-methods__reference-video.payment-methods__reference--disabled {
+      background-image: url("../images/common/reference/youtube_disabled.svg"); }
+
 .box-row {
   border-bottom: 1px solid #dedede; }
   .box-row__box {
@@ -1032,6 +1052,9 @@ body #not_authenticated_financial ul.checked > li {
     line-height: 22px;
     padding: 4px 0; }
 
+.set-currency-content .list-style-inside {
+  list-style-position: inside; }
+
 .platforms-content img.responsive {
   max-height: 150px;
   width: auto; }
@@ -1101,12 +1124,40 @@ body #not_authenticated_financial ul.checked > li {
       background: url("../images/pages/authenticate/add.svg") no-repeat; }
     .authenticate-content .fields > .gr-row > div > .button > span.remove {
       background: url("../images/pages/authenticate/remove.svg") no-repeat; }
+    .authenticate-content .fields > .gr-row > div > .button > span.checked {
+      width: 16px;
+      height: 12px; }
+    .authenticate-content .fields > .gr-row > div > .button > span:hover {
+      background-color: transparent; }
+  .authenticate-content .fields > .gr-row > div > .button.selected {
+    background-color: #fff; }
+  .authenticate-content .fields > .gr-row > div > .button.error {
+    color: #c03; }
+    .authenticate-content .fields > .gr-row > div > .button.error:before {
+      content: '*'; }
 
 .authenticate-content .fields > .gr-row > div > input[type=file] {
   display: none; }
 
 .authenticate-content .center-text .button .barspinner {
   margin: 0 auto; }
+
+.authenticate-content .submit-status table th:not(:last-child) {
+  width: 25%; }
+
+.authenticate-content .submit-status table .status.error-msg {
+  font-size: inherit;
+  font-style: normal; }
+
+.authenticate-content .checked {
+  background: url("../images/pages/authenticate/checked.svg") no-repeat;
+  width: 16px;
+  height: 12px;
+  display: inline-block;
+  margin-left: 5px; }
+
+.authenticate-content #resolve_error {
+  color: #c03; }
 
 #content.careers-content {
   margin-top: 0; }
@@ -1206,44 +1257,6 @@ body #not_authenticated_financial ul.checked > li {
                 justify-content: center; } }
   #content.careers-content .career h4 {
     color: #2a3052; }
-  #content.careers-content .career .graduate-container {
-    position: relative;
-    margin-top: 1em; }
-    #content.careers-content .career .graduate-container .graduate-box {
-      background-color: #2a3052;
-      padding: 30px;
-      position: absolute;
-      top: 50px;
-      width: 100%; }
-      @media (max-width: 480px) {
-        #content.careers-content .career .graduate-container .graduate-box h1 {
-          font-size: 1.520875rem; } }
-      #content.careers-content .career .graduate-container .graduate-box p {
-        color: #fff; }
-        @media (max-width: 480px) {
-          #content.careers-content .career .graduate-container .graduate-box p {
-            font-size: 0.8695652174rem; } }
-      #content.careers-content .career .graduate-container .graduate-box a.button span {
-        background-color: #fff;
-        color: #2a3052;
-        border-radius: 0;
-        font-weight: 600; }
-      @media screen and (max-width: 1024px) and (min-width: 769px) {
-        #content.careers-content .career .graduate-container .graduate-box {
-          left: 16%;
-          bottom: 24%;
-          top: unset; } }
-      @media (max-width: 768px) {
-        #content.careers-content .career .graduate-container .graduate-box {
-          text-align: center;
-          background-color: transparent;
-          top: 50%;
-          left: 50%;
-          -webkit-transform: translate(-50%, -50%);
-                  transform: translate(-50%, -50%); } }
-      @media (max-width: 480px) {
-        #content.careers-content .career .graduate-container .graduate-box {
-          padding: 15px; } }
   #content.careers-content .career ul.role-section {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -1312,6 +1325,90 @@ body #not_authenticated_financial ul.checked > li {
   .welcome-content .box > .box-item-end p {
     margin-top: 0;
     margin-bottom: 10px; }
+
+.two_factor_auth .padding-left-medium {
+  padding-left: 45px; }
+
+.two_factor_auth .otp-form-group {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start; }
+  .two_factor_auth .otp-form-group input {
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    height: 37px;
+    width: 140px;
+    margin-bottom: 5px;
+    margin-right: 5px; }
+
+.two_factor_auth .steps.steps-vertical {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  padding-left: 15px; }
+  .two_factor_auth .steps.steps-vertical .step {
+    position: relative;
+    margin-top: 0px; }
+    .two_factor_auth .steps.steps-vertical .step:not(:last-child) {
+      border-left: 1px solid #f2f2f2; }
+    .two_factor_auth .steps.steps-vertical .step .circle {
+      margin: 0;
+      position: absolute;
+      left: -20px; }
+    .two_factor_auth .steps.steps-vertical .step .content {
+      padding: 8px 0 0 30px; }
+      .two_factor_auth .steps.steps-vertical .step .content p {
+        margin: 0; }
+        .two_factor_auth .steps.steps-vertical .step .content p:last-child, .two_factor_auth .steps.steps-vertical .step .content p:nth-child(2) {
+          padding-bottom: 15px; }
+      .two_factor_auth .steps.steps-vertical .step .content #qrcode {
+        padding-bottom: 60px; }
+        @media (max-width: 480px) {
+          .two_factor_auth .steps.steps-vertical .step .content #qrcode {
+            padding-bottom: 10px; } }
+
+.two_factor_auth .two-fa-status {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-top: 40px;
+  margin-bottom: 50px; }
+  .two_factor_auth .two-fa-status-container {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    padding: 10px 30px 10px 15px;
+    background: #f2f2f2; }
+  .two_factor_auth .two-fa-status-icon {
+    max-width: 55px;
+    max-height: 55px;
+    padding-right: 15px; }
+
+#signup_form input {
+  width: 100%;
+  height: 3em;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  text-align: center;
+  font-size: 0.8695652174rem; }
+
+#signup_form button {
+  width: 100%;
+  height: 3rem;
+  margin: 5px 0; }
+
+#contract-specification table td {
+  white-space: nowrap; }
 
 .timeline {
   margin: 0 auto;
