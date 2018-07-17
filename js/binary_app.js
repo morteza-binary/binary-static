@@ -5364,7 +5364,7 @@ var getBasename = function getBasename() {
         return basename[1];
     }
 
-    return '/en/app/';
+    return '/en/app';
 };
 
 var BinaryApp = function BinaryApp(_ref) {
