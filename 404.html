@@ -89,7 +89,7 @@
         // if the url is not related to new app, returns false.
         var lang_regex_string = '(.*)(' + all_languages.join('|') + ')\/app[?\/]';
 
-        if (!new RegExp(lang_regex_string).test(href)) {
+        if (!new RegExp(lang_regex_string).test(l.pathname)) {
             return false;
         }
 
@@ -111,7 +111,7 @@
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
             l.hash
         );
-        
+        console.log('2>>>>>>>>>>>>>>>><<<<<<<<<<<<<<2');
         console.log(l.href);
 
         return true;
