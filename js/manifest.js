@@ -91,7 +91,7 @@
 /******/ 		if (__webpack_require__.nc) {
 /******/ 			script.setAttribute("nonce", __webpack_require__.nc);
 /******/ 		}
-/******/ 		script.src = __webpack_require__.p + "" + ({"0":"highstock","1":"vendor","2":"binary","3":"binary_app","4":"webtrader-charts"}[chunkId]||chunkId) + "_" + {"0":"e5d45f1743e05a71f071","1":"e10d242e525aa9d48758","2":"9ebd7e4ed2674451ff77","3":"a475805e359beeac65c9","4":"7da591ff40438d7f882e"}[chunkId] + ".min.js";
+/******/ 		script.src = __webpack_require__.p + "" + ({"0":"highstock","1":"vendor","2":"binary","3":"binary_app","4":"webtrader-charts"}[chunkId]||chunkId) + "_" + {"0":"e5d45f1743e05a71f071","1":"e10d242e525aa9d48758","2":"9ebd7e4ed2674451ff77","3":"ae41cdcf6c156ffadd73","4":"7da591ff40438d7f882e"}[chunkId] + ".min.js";
 /******/ 		var timeout = setTimeout(onScriptComplete, 120000);
 /******/ 		script.onerror = script.onload = onScriptComplete;
 /******/ 		function onScriptComplete() {

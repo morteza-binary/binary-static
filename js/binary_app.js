@@ -560,7 +560,7 @@ var BaseStore = (_class = (_temp = _class2 = function () {
 
             if (this.session_storage_properties.length) {
                 (0, _mobx.reaction)(function () {
-                    return _this2.local_storage_properties.map(function (i) {
+                    return _this2.session_storage_properties.map(function (i) {
                         return _this2[i];
                     });
                 }, function () {
@@ -5357,14 +5357,14 @@ var initApp = function initApp() {
  */
 // import { configure }              from 'mobx';
 var getBasename = function getBasename() {
-    var regex_string = '(.*(' + Object.keys((0, _language.getAll)()).join('|') + ')/app\\.html).*';
+    var regex_string = '(.*(' + Object.keys((0, _language.getAll)()).join('|') + ')/app).*';
     var basename = new RegExp(regex_string, 'ig').exec(window.location.pathname);
 
     if (basename && basename.length) {
         return basename[1];
     }
 
-    return '/en/app.html';
+    return '/en/app/';
 };
 
 var BinaryApp = function BinaryApp(_ref) {
@@ -12790,9 +12790,9 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     function TradeStore(root_store) {
         _classCallCheck(this, TradeStore);
 
-        var local_storage_properties = _query_string.allowed_query_string_variables;
+        var session_storage_properties = _query_string.allowed_query_string_variables;
 
-        var _this = _possibleConstructorReturn(this, (TradeStore.__proto__ || Object.getPrototypeOf(TradeStore)).call(this, root_store, local_storage_properties));
+        var _this = _possibleConstructorReturn(this, (TradeStore.__proto__ || Object.getPrototypeOf(TradeStore)).call(this, root_store, null, session_storage_properties));
 
         _initDefineProp(_this, 'is_purchase_enabled', _descriptor, _this);
 
