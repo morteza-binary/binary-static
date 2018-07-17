@@ -111,6 +111,8 @@
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
             l.hash
         );
+        
+        console.log(l.href);
 
         return true;
     }
