@@ -5357,7 +5357,7 @@ var initApp = function initApp() {
  */
 // import { configure }              from 'mobx';
 var getBasename = function getBasename() {
-    var regex_string = '(.*(' + Object.keys((0, _language.getAll)()).join('|') + ')/app).*';
+    var regex_string = '(.*(' + Object.keys((0, _language.getAll)()).join('|') + ')/app(/index\\.html)?).*';
     var basename = new RegExp(regex_string, 'ig').exec(window.location.pathname);
 
     if (basename && basename.length) {
