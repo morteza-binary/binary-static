@@ -100,10 +100,6 @@
         // the value of segment_count should be 2.
         var segment_count =  2 + sub_directories.split('/').length;
 
-        if (rxResult[3]) {
-            segment_count += 1;
-        }
-
         var pathname = l.pathname;
 
         pathname.toLowerCase().replace('index.html', '');
