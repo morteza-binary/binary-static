@@ -104,13 +104,17 @@
             segment_count += 1;
         }
 
+        var pathname = l.pathname;
+
+        pathname.toLowerCase().replace('index.html', '');
+
         // Converting the path and query strings into just query strings and
         // then redirects the browser to the new url with only query strings and hash fragment.
         // https://www.binary.com/en/app/statement -> https://www.binary.com/en/app?p=/statement
         l.replace(
             l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-            l.pathname.split('/').slice(0, segment_count).join('/') + '?p=/' +
-            l.pathname.split('/').slice(segment_count).join('/').replace(/&/g, '~and~') +
+            pathname.split('/').slice(0, segment_count).join('/') + '/?p=' +
+            pathname.split('/').slice(segment_count).join('/').replace(/&/g, '~and~') +
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
             l.hash
         );
