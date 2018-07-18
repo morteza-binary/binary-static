@@ -87,17 +87,22 @@
         var l = window.location;
 
         // if the url is not related to new app, returns false.
-        var lang_regex_string = '(.*)(' + all_languages.join('|') + ')\/app[?\/](index\\.html)?';
+        var lang_regex_string = '(.*)(' + all_languages.join('|') + ')\/app[?\/](\\w*\\.html)?';
 
         if (!new RegExp(lang_regex_string).test(l.pathname)) {
             return false;
         }
 
-        var sub_directories = new RegExp(lang_regex_string).exec(l.pathname)[1];
+        var rxResult = new RegExp(lang_regex_string).exec(l.pathname)
+        var sub_directories = rxResult[1];
 
         // Since there are two sub entries after CNAME URL for the app 'www.binary.com/en/app'
         // the value of segment_count should be 2.
         var segment_count = sub_directories.split('/').length;
+
+        if (rxResult.length === 4) {
+            segment_count += 1;
+        }
 
 
 
