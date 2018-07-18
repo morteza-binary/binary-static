@@ -98,7 +98,7 @@
 
         // Since there are two sub entries after CNAME URL for the app 'www.binary.com/en/app'
         // the value of segment_count should be 2.
-        var segment_count = sub_directories.split('/').length;
+        var segment_count =  1 + sub_directories.split('/').length;
 
         if (rxResult[3]) {
             segment_count += 1;
@@ -109,7 +109,7 @@
         // https://www.binary.com/en/app/statement -> https://www.binary.com/en/app?p=/statement
         l.replace(
             l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-            l.pathname.split('/').slice(0, 2 + segment_count).join('/') + '?p=/' +
+            l.pathname.split('/').slice(0, 1 + segment_count).join('/') + '?p=/' +
             l.pathname.slice(1).split('/').slice(segment_count).join('/').replace(/&/g, '~and~') +
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
             l.hash
