@@ -86,14 +86,12 @@
 
         var l = window.location;
 
-        // if the url is not related to new app, returns false.
-        var lang_regex_string = '(.*)(' + all_languages.join('|') + ')\/app[?\/](\\w*\\.html)?';
+                var rxResult = new RegExp(lang_regex_string).exec(l.pathname)
 
-        if (!new RegExp(lang_regex_string).test(l.pathname)) {
+        if (!new RegExp(lang_regex_string).test(l.pathname) || (rxResult[3] && rxResult[3] !== 'index.html')) {
             return false;
         }
 
-        var rxResult = new RegExp(lang_regex_string).exec(l.pathname)
         var sub_directories = rxResult[1];
 
         // Since there are two sub entries after CNAME URL for the app 'www.binary.com/en/app'
@@ -104,21 +102,17 @@
             segment_count += 1;
         }
 
-
-
         // Converting the path and query strings into just query strings and
         // then redirects the browser to the new url with only query strings and hash fragment.
         // https://www.binary.com/en/app/statement -> https://www.binary.com/en/app?p=/statement
-        var url = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
             l.pathname.split('/').slice(0, 1 + segment_count).join('/') + '?p=/' +
             l.pathname.slice(1).split('/').slice(segment_count).join('/').replace(/&/g, '~and~') +
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
-            l.hash;
-        
-        console.log(url);
-        l.replace(
-            url
+            l.hash
         );
+
 
         return true;
     }
