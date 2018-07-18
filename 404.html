@@ -86,7 +86,8 @@
 
         var l = window.location;
 
-        var lang_regex_string = '(.*)(' + all_languages.join('|') + ')\/app[?\/](\\w*\\.html)?';
+        // if the url is not related to new app, returns false.
+        var lang_regex_string = '(.*)(' + all_languages.join('|') + ')\/app\/(\\w*\\.html)?';
         var rxResult = new RegExp(lang_regex_string).exec(l.pathname)
 
         if (!new RegExp(lang_regex_string).test(l.pathname) || (rxResult[3] && rxResult[3] !== 'index.html')) {
@@ -113,7 +114,6 @@
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
             l.hash
         );
-
 
         return true;
     }
