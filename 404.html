@@ -109,12 +109,15 @@
         // Converting the path and query strings into just query strings and
         // then redirects the browser to the new url with only query strings and hash fragment.
         // https://www.binary.com/en/app/statement -> https://www.binary.com/en/app?p=/statement
-        l.replace(
-            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        var url = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
             l.pathname.split('/').slice(0, 1 + segment_count).join('/') + '?p=/' +
             l.pathname.slice(1).split('/').slice(segment_count).join('/').replace(/&/g, '~and~') +
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~'): '') +
-            l.hash
+            l.hash;
+        
+        console.log(url);
+        l.replace(
+            url
         );
 
         return true;
