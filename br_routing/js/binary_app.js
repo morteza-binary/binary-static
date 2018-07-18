@@ -12952,7 +12952,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
                     }
 
                     // Add changes to queryString of the url
-                    if (_query_string.allowed_query_string_variables.indexOf(key) !== -1) {
+                    if (_query_string.allowed_query_string_variables.indexOf(key) !== -1 && /app[/]?$/.test(window.location.pathname)) {
                         _URL2.default.setQueryParam(_defineProperty({}, key, new_state[key]));
                     }
 
