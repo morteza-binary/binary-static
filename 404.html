@@ -100,7 +100,7 @@
         // the value of segment_count should be 2.
         var segment_count = sub_directories.split('/').length;
 
-        if (rxResult.length === 4) {
+        if (rxResult[3]) {
             segment_count += 1;
         }
 
