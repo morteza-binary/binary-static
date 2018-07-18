@@ -87,7 +87,7 @@
         var l = window.location;
 
         // if the url is not related to new app, returns false.
-        var lang_regex_string = '(.*)(' + all_languages.join('|') + ')\/app\/(\\w*\\.html)?';
+        var lang_regex_string = '(.*)(' + all_languages.join('|') + ')\/app\/(\\w+\\.html)?';
         var rxResult = new RegExp(lang_regex_string).exec(l.pathname)
 
         if (!new RegExp(lang_regex_string).test(l.pathname) || (rxResult[3] && rxResult[3] !== 'index.html')) {
