@@ -1783,6 +1783,7 @@ div.dropdown-container {
     margin: 0 !important;
     border: none;
     outline: none;
+    width: 100%;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     font-size: 14px;
@@ -1988,9 +1989,11 @@ div.datepicker-container {
       opacity: 1;
       pointer-events: auto; }
     div.datepicker-container .picker-calendar-icon.picker-calendar-icon:before, div.datepicker-container .close-circle-icon.picker-calendar-icon:before {
-      background-image: url("../images/app_2/common/calendar.svg"); }
+      background-image: url("../images/app_2/common/calendar.svg");
+      background-repeat: no-repeat; }
     div.datepicker-container .picker-calendar-icon.close-circle-icon:before, div.datepicker-container .close-circle-icon.close-circle-icon:before {
-      background-image: url("../images/app_2/common/close_circle.svg"); }
+      background-image: url("../images/app_2/common/close_circle.svg");
+      background-repeat: no-repeat; }
   div.datepicker-container .datepicker-calendar .calendar {
     opacity: 0;
     -webkit-transform: scale(1, 0);
