@@ -88,22 +88,20 @@
 
         // if the url is not related to new app, returns false.
         var lang_regex_string = '(.*)\/(' + all_languages.join('|') + ')\/app\/(\\w+\\.html)?';
-        var rxResult = new RegExp(lang_regex_string).exec(l.pathname)
+        var rx_result = new RegExp(lang_regex_string).exec(l.pathname)
 
-        if (!new RegExp(lang_regex_string).test(l.pathname) || (rxResult[3] && rxResult[3] !== 'index.html')) {
+        if (!new RegExp(lang_regex_string).test(l.pathname) || (rx_result[3] && rx_result[3] !== 'index.html')) {
             return false;
         }
 
-        var sub_directories = rxResult[1];
+        var sub_directories = rx_result[1];
 
         // Since there are two sub entries after CNAME URL for the app 'www.binary.com/en/app'
         // the value of segment_count should be 2.
-        var segment_count =  2 + sub_directories.split('/').length;
+        var segment_count = 2 + sub_directories.split('/').length;
 
 
-        var pathname = l.pathname;
-
-        pathname = pathname.toLowerCase().replace('/index.html', '');
+        var pathname = l.pathname.toLowerCase().replace(/\/index(\.html)?/, '');
 
         // Converting the path and query strings into just query strings and
         // then redirects the browser to the new url with only query strings and hash fragment.
