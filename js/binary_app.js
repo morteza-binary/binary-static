@@ -6106,20 +6106,20 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 var routes = {
-    account_password: '/account_password',
-    apps: '/apps',
-    cashier_password: '/cashier_password',
-    exclusion: '/exclusion',
-    financial: '/financial',
-    history: '/history',
+    account_password: '/settings/account_password',
+    apps: '/settings/apps',
+    cashier_password: '/settings/cashier_password',
+    exclusion: '/settings/exclusion',
+    financial: '/settings/financial',
+    history: '/settings/history',
     index: '/index',
-    limits: '/limits',
-    personal: '/personal',
+    limits: '/settings/limits',
+    personal: '/settings/personal',
     portfolio: '/portfolio',
     root: '/',
     settings: '/settings',
     statement: '/statement',
-    token: '/token',
+    token: '/settings/token',
     trade: '/trade'
 };
 
@@ -15088,18 +15088,22 @@ var Settings = function Settings(_ref) {
     }, {});
 
     // Redirect doesn't work with relative paths
-    var getAbsolutePath = function getAbsolutePath(component) {
-        var path = component_to_path[component.displayName || component.name];
-        var base = match.url[match.url.length - 1] === '/' ? match.url.slice(0, -1) : match.url;
-        return '' + base + path;
-    };
+    // const getAbsolutePath = (component) => {
+    //     const path = component_to_path[component.displayName || component.name];
+    //     const base = match.url[match.url.length - 1] === '/'
+    //         ? match.url.slice(0, -1)
+    //         : match.url;
+    //     return `${base}${path}`;
+    // };
 
     // Add paths from this.props.routes to items
     var data = _settings_data2.default.map(function (section) {
         return _extends({}, section, {
             items: section.items.map(function (item) {
                 return _extends({}, item, {
-                    path: getAbsolutePath(item.Component)
+                    // path: getAbsolutePath(item.Component),
+                    path: component_to_path[item.Component.displayname || item.Component.name]
+
                 });
             })
         });
@@ -17781,7 +17785,7 @@ var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _m
     function UIStore() {
         _classCallCheck(this, UIStore);
 
-        var local_storage_properties = ['is_portfolio_drawer_on'];
+        var local_storage_properties = ['is_chart_asset_info_visible', 'is_chart_countdown_visible', 'is_chart_layout_default', 'is_dark_mode_on', 'is_portfolio_drawer_on', 'is_purchase_confirm_on', 'is_purchase_lock_on'];
 
         var _this = _possibleConstructorReturn(this, (UIStore.__proto__ || Object.getPrototypeOf(UIStore)).call(this, null, local_storage_properties));
 
