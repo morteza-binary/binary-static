@@ -4719,6 +4719,7 @@ var InputField = function InputField(_ref) {
 
     var has_error = error_messages && error_messages.length;
     var input = _react2.default.createElement('input', {
+        autoFocus: true,
         className: (0, _classnames2.default)({ error: has_error }),
         type: type,
         name: name,
@@ -4752,11 +4753,11 @@ var InputField = function InputField(_ref) {
             { className: 'input-helper' },
             helper
         ),
-        has_error ? _react2.default.createElement(
+        _react2.default.createElement(
             _tooltip2.default,
-            { alignment: 'left', message: error_messages[0] },
+            { alignment: 'left', message: !!has_error && error_messages[0] },
             input
-        ) : input
+        )
     );
 };
 
