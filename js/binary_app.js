@@ -3046,7 +3046,7 @@ var ContractType = function () {
         var obj_duration_unit = getDurationUnit(duration_unit, contract_type, obj_start_type.contract_start_type);
 
         var obj_duration_units_list = getDurationUnitsList(contract_type, obj_start_type.contract_start_type);
-        var obj_duration_units_min_max = getDurationUnitsMinMax(contract_type, obj_start_type.contract_start_type);
+        var obj_duration_units_min_max = getDurationMinMax(contract_type, obj_start_type.contract_start_type);
 
         return _extends({}, form_components, obj_basis, obj_trade_types, obj_start_dates, obj_start_type, obj_barrier, obj_duration_unit, obj_duration_units_list, obj_duration_units_min_max);
     };
@@ -3072,12 +3072,6 @@ var ContractType = function () {
         };
     };
 
-    var getDurationUnitsMinMax = function getDurationUnitsMinMax(contract_type, contract_start_type) {
-        return {
-            duration_units_min_max: (0, _utility.getPropertyValue)(available_contract_types, [contract_type, 'config', 'durations', 'min_max', contract_start_type]) || []
-        };
-    };
-
     var getDurationUnit = function getDurationUnit(duration_unit, contract_type, contract_start_type) {
         var duration_units = (0, _utility.getPropertyValue)(available_contract_types, [contract_type, 'config', 'durations', 'units_display', contract_start_type]) || [];
         var arr_units = [];
@@ -3092,9 +3086,13 @@ var ContractType = function () {
 
     // TODO: use this getter function to dynamically compare min/max versus duration amount
     var getDurationMinMax = function getDurationMinMax(contract_type, contract_start_type, contract_expiry_type) {
-        return {
-            duration_min_max: (0, _utility.getPropertyValue)(available_contract_types, [contract_type, 'config', 'durations', 'min_max', contract_start_type, contract_expiry_type]) || {}
-        };
+        var duration_min_max = (0, _utility.getPropertyValue)(available_contract_types, [contract_type, 'config', 'durations', 'min_max', contract_start_type]) || {};
+
+        if (contract_expiry_type) {
+            duration_min_max = duration_min_max[contract_expiry_type] || {};
+        }
+
+        return { duration_min_max: duration_min_max };
     };
 
     var getStartType = function getStartType(start_date) {
@@ -4706,7 +4704,7 @@ var InputField = function InputField(_ref) {
     var className = _ref.className,
         error_messages = _ref.error_messages,
         helper = _ref.helper,
-        is_currency = _ref.is_currency,
+        is_float = _ref.is_float,
         is_disabled = _ref.is_disabled,
         label = _ref.label,
         name = _ref.name,
@@ -4714,6 +4712,8 @@ var InputField = function InputField(_ref) {
         placeholder = _ref.placeholder,
         prefix = _ref.prefix,
         required = _ref.required,
+        _ref$step = _ref.step,
+        step = _ref$step === undefined ? '0.01' : _ref$step,
         type = _ref.type,
         value = _ref.value;
 
@@ -4722,7 +4722,7 @@ var InputField = function InputField(_ref) {
         className: (0, _classnames2.default)({ error: has_error }),
         type: type,
         name: name,
-        step: is_currency ? '0.01' : undefined,
+        step: is_float ? step : undefined,
         placeholder: placeholder || undefined,
         disabled: is_disabled,
         value: value,
@@ -4769,7 +4769,7 @@ InputField.propTypes = {
     className: _propTypes2.default.string,
     error_messages: _mobxReact.PropTypes.arrayOrObservableArray,
     helper: _propTypes2.default.bool,
-    is_currency: _propTypes2.default.bool,
+    is_float: _propTypes2.default.bool,
     is_disabled: _propTypes2.default.string,
     label: _propTypes2.default.string,
     name: _propTypes2.default.string,
@@ -4777,6 +4777,7 @@ InputField.propTypes = {
     placeholder: _propTypes2.default.string,
     prefix: _propTypes2.default.string,
     required: _propTypes2.default.bool,
+    step: _propTypes2.default.string,
     type: _propTypes2.default.string,
     value: _propTypes2.default.oneOfType([_propTypes2.default.number, _propTypes2.default.string])
 };
@@ -16460,7 +16461,7 @@ var Amount = function Amount(_ref) {
                 name: 'amount',
                 value: amount,
                 onChange: onChange,
-                is_currency: true,
+                is_float: true,
                 prefix: has_currency ? currency : null,
                 is_nativepicker: is_nativepicker,
                 error_messages: validation_errors.amount
@@ -16568,8 +16569,8 @@ var Barrier = function Barrier(_ref) {
             name: 'barrier_2',
             value: barrier_2,
             onChange: onChange,
-            is_currency: true,
-            error_messages: validation_errors.barrier_2 || []
+            is_float: true,
+            error_messages: validation_errors.barrier_2
         })
     );
 };
@@ -19307,9 +19308,9 @@ var onChangeStartDate = exports.onChangeStartDate = function onChangeStartDate(s
     start_time = obj_start_time.start_time;
     var obj_end_time = _contract_type2.default.getEndTime(sessions, start_date, start_time, expiry_date, expiry_time);
 
-    var obj_duration_units_min_max = _contract_type2.default.getDurationUnitsList(contract_type, contract_start_type);
+    var obj_duration_min_max = _contract_type2.default.getDurationMinMax(contract_type, contract_start_type);
 
-    return _extends({}, obj_contract_start_type, obj_duration_units_list, obj_duration_units_min_max, obj_duration_unit, obj_sessions, obj_start_time, obj_end_time);
+    return _extends({}, obj_contract_start_type, obj_duration_units_list, obj_duration_min_max, obj_duration_unit, obj_sessions, obj_start_time, obj_end_time);
 };
 
 /***/ }),
@@ -19460,7 +19461,7 @@ var validation_rules = {
     amount: [['req', { message: 'The amount is a required field.' }], ['number', { min: 0, type: 'float' }]],
     barrier_1: ['barrier'],
     barrier_2: ['barrier'],
-    duration: [['req', { message: 'The duratoin is a required field.' }]]
+    duration: [['req', { message: 'The duration is a required field.' }]]
 };
 
 exports.default = validation_rules;
@@ -20105,7 +20106,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
 
         _initDefineProp(_this, 'duration_units_list', _descriptor17, _this);
 
-        _initDefineProp(_this, 'duration_units_min_max', _descriptor18, _this);
+        _initDefineProp(_this, 'duration_min_max', _descriptor18, _this);
 
         _initDefineProp(_this, 'expiry_date', _descriptor19, _this);
 
@@ -20144,7 +20145,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
 
         // Adds intercept to change min_max value of duration validation
         (0, _mobx.reaction)(function () {
-            return [_this.duration_units_min_max, _this.contract_expiry_type, _this.duration_unit];
+            return [_this.duration_min_max, _this.contract_expiry_type, _this.duration_unit];
         }, function () {
             _this.changeDurationValidationRules();
         });
@@ -20364,7 +20365,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
             var index = this.validation_rules.duration.findIndex(function (item) {
                 return item[0] === 'number';
             });
-            var limits = this.duration_units_min_max[this.contract_expiry_type] || false;
+            var limits = this.duration_min_max[this.contract_expiry_type] || false;
             var duration_options = {
                 min: (0, _duration.convertDurationLimit)(+limits.min, this.duration_unit),
                 max: (0, _duration.convertDurationLimit)(+limits.max, this.duration_unit)
@@ -20465,7 +20466,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     initializer: function initializer() {
         return [];
     }
-}), _descriptor18 = _applyDecoratedDescriptor(_class.prototype, 'duration_units_min_max', [_mobx.observable], {
+}), _descriptor18 = _applyDecoratedDescriptor(_class.prototype, 'duration_min_max', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
@@ -21821,7 +21822,7 @@ var Validator = function () {
                         return;
                     }
 
-                    if (_this.input[attribute] === '' && rule.name !== 'req') {
+                    if (_this.input[attribute] === '' && ruleObject.name !== 'req') {
                         return;
                     }
 
