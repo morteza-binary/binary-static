@@ -4755,7 +4755,7 @@ var InputField = function InputField(_ref) {
         ),
         _react2.default.createElement(
             _tooltip2.default,
-            { alignment: 'left', message: !!has_error && error_messages[0] },
+            { alignment: 'left', message: has_error ? error_messages[0] : null },
             input
         )
     );
