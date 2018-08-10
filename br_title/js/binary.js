@@ -1135,7 +1135,7 @@ var Url = __webpack_require__(11);
 var applyToAllElements = __webpack_require__(3).applyToAllElements;
 var createElement = __webpack_require__(3).createElement;
 var findParent = __webpack_require__(3).findParent;
-__webpack_require__(837);
+__webpack_require__(838);
 
 var BinaryPjax = function () {
     var previous_url = void 0;
@@ -6394,7 +6394,7 @@ var WebtraderChart = function () {
         if (!is_initialized) {
             __webpack_require__.e/* require.ensure */(0).then((function () {
                 __webpack_require__.e/* require.ensure */(4).then((function (require) {
-                    WebtraderCharts = __webpack_require__(882);
+                    WebtraderCharts = __webpack_require__(883);
                     WebtraderCharts.init({
                         server: Config.getSocketURL(),
                         appId: Config.getAppId(),
@@ -19037,7 +19037,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 // (+ some custom changes for binary.com)
 
 var $ = __webpack_require__(76);
-var Kinetic = __webpack_require__(852);
+var Kinetic = __webpack_require__(853);
 
 module.exports = function (_options) {
     var that = this;
@@ -20458,7 +20458,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var Client = __webpack_require__(6);
 var getLanguage = __webpack_require__(14).get;
 var urlForStatic = __webpack_require__(11).urlForStatic;
-var Pushwoosh = __webpack_require__(876).Pushwoosh;
+var Pushwoosh = __webpack_require__(877).Pushwoosh;
 
 var BinaryPushwoosh = function () {
     var pw = new Pushwoosh();
@@ -20738,17 +20738,17 @@ var TNCApproval = __webpack_require__(243);
 var VideoFacility = __webpack_require__(440);
 
 // ==================== static ====================
-var GetStartedJP = __webpack_require__(627);
-var HomeJP = __webpack_require__(628);
-var Charity = __webpack_require__(629);
-var Contact = __webpack_require__(630);
-var GetStarted = __webpack_require__(631);
+var GetStartedJP = __webpack_require__(628);
+var HomeJP = __webpack_require__(629);
+var Charity = __webpack_require__(630);
+var Contact = __webpack_require__(631);
+var GetStarted = __webpack_require__(632);
 var Home = __webpack_require__(286);
-var JobDetails = __webpack_require__(632);
-var Regulation = __webpack_require__(633);
-var StaticPages = __webpack_require__(634);
-var TermsAndConditions = __webpack_require__(635);
-var WhyUs = __webpack_require__(636);
+var JobDetails = __webpack_require__(633);
+var Regulation = __webpack_require__(634);
+var StaticPages = __webpack_require__(635);
+var TermsAndConditions = __webpack_require__(636);
+var WhyUs = __webpack_require__(637);
 
 /* eslint-disable max-len */
 var pages_config = {
@@ -29572,7 +29572,7 @@ module.exports = SelfExclusion;
 "use strict";
 
 
-var QRCode = __webpack_require__(838);
+var QRCode = __webpack_require__(839);
 var Client = __webpack_require__(6);
 var BinarySocket = __webpack_require__(8);
 var FormManager = __webpack_require__(23);
@@ -32176,7 +32176,8 @@ module.exports = VideoFacility;
 /* 623 */,
 /* 624 */,
 /* 625 */,
-/* 626 */
+/* 626 */,
+/* 627 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32210,7 +32211,7 @@ $(window).on('pageshow', function (e) {
 });
 
 /***/ }),
-/* 627 */
+/* 628 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32274,7 +32275,7 @@ var GetStartedJP = function () {
 module.exports = GetStartedJP;
 
 /***/ }),
-/* 628 */
+/* 629 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32381,7 +32382,7 @@ var HomeJP = function () {
 module.exports = HomeJP;
 
 /***/ }),
-/* 629 */
+/* 630 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32420,7 +32421,7 @@ var Charity = function () {
 module.exports = Charity;
 
 /***/ }),
-/* 630 */
+/* 631 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32496,7 +32497,7 @@ var Contact = function () {
 module.exports = Contact;
 
 /***/ }),
-/* 631 */
+/* 632 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32548,7 +32549,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 632 */
+/* 633 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32619,7 +32620,7 @@ var JobDetails = function () {
 module.exports = JobDetails;
 
 /***/ }),
-/* 633 */
+/* 634 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32693,7 +32694,7 @@ var Regulation = function () {
 module.exports = Regulation;
 
 /***/ }),
-/* 634 */
+/* 635 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32772,7 +32773,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 635 */
+/* 636 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32919,7 +32920,7 @@ var TermsAndConditions = function () {
 module.exports = TermsAndConditions;
 
 /***/ }),
-/* 636 */
+/* 637 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32947,7 +32948,6 @@ var WhyUs = function () {
 module.exports = WhyUs;
 
 /***/ }),
-/* 637 */,
 /* 638 */,
 /* 639 */,
 /* 640 */,
@@ -33190,17 +33190,18 @@ module.exports = WhyUs;
 /* 877 */,
 /* 878 */,
 /* 879 */,
-/* 880 */
-/***/ (function(module, exports) {
-
-/* (ignored) */
-
-/***/ }),
+/* 880 */,
 /* 881 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
+/***/ }),
+/* 882 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
 /***/ })
-],[626]);
+],[627]);
 //# sourceMappingURL=binary.js.map
