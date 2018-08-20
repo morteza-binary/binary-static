@@ -22850,7 +22850,7 @@ var getProposalParametersName = exports.getProposalParametersName = function get
             keys.splice(index, 1);
 
             if (typeof alternatives[name] === 'string') {
-                keys.push(name);
+                keys.push(alternatives[name]);
             } else if (typeof alternatives[name] === 'function') {
                 keys.push(alternatives[name](is_digit));
             }
@@ -23306,11 +23306,11 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
 
                             case 9:
                                 snapshot = _context2.sent;
-                                query_string_values = this.is_query_string_applied ? {} : this.updateQueryString();
+                                query_string_values = this.updateQueryString();
 
                                 snapshot.is_trade_enabled = true;
 
-                                this.updateStore(_extends({}, snapshot, query_string_values));
+                                this.updateStore(_extends({}, snapshot, this.is_query_string_applied ? {} : query_string_values));
 
                                 this.is_query_string_applied = true;
 
@@ -24635,6 +24635,8 @@ var URLHelper = function () {
                 });
             }
 
+            // URLHelper.pruneQueryString(allowed_query_string_variables);
+
             return query_params;
         }
 
@@ -24655,7 +24657,9 @@ var URLHelper = function () {
                 return keys.indexOf(value[0]) <= -1 && query_params.delete(value[0]);
             });
 
-            window.history.replaceState(null, null, '?' + query_params.toString());
+            var query_string = [].concat(_toConsumableArray(query_params)).length ? '?' + query_params.toString() : '';
+
+            window.history.replaceState(null, null, query_string);
         }
     }]);
 
