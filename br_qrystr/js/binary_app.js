@@ -19550,13 +19550,12 @@ var Trade = function (_React$Component) {
     _createClass(Trade, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            this.props.tradeComponentDidMount();
-            this.props.updateQueryString();
+            this.props.onMount();
         }
     }, {
         key: 'componentWillUnmount',
         value: function componentWillUnmount() {
-            this.props.tradeComponentWillUnmount();
+            this.props.onUnmount();
         }
     }, {
         key: 'render',
@@ -19589,13 +19588,12 @@ Trade.propTypes = {
     is_contract_mode: _propTypes2.default.bool,
     is_mobile: _propTypes2.default.bool,
     is_trade_enabled: _propTypes2.default.bool,
-    onSymbolChange: _propTypes2.default.func,
     onClickNewTrade: _propTypes2.default.func,
+    onMount: _propTypes2.default.func,
+    onSymbolChange: _propTypes2.default.func,
+    onUnmount: _propTypes2.default.func,
     purchase_info: _propTypes2.default.object,
-    symbol: _propTypes2.default.string,
-    tradeComponentDidMount: _propTypes2.default.func,
-    tradeComponentWillUnmount: _propTypes2.default.func,
-    updateQueryString: _propTypes2.default.func
+    symbol: _propTypes2.default.string
 };
 
 exports.default = (0, _connect.connect)(function (_ref) {
@@ -19603,15 +19601,14 @@ exports.default = (0, _connect.connect)(function (_ref) {
         ui = _ref.ui;
     return {
         is_contract_mode: modules.smart_chart.is_contract_mode,
+        is_mobile: ui.is_mobile,
         is_trade_enabled: modules.trade.is_trade_enabled,
         onClickNewTrade: modules.trade.onClickNewTrade,
+        onMount: modules.trade.onMount,
         onSymbolChange: modules.trade.onChange,
+        onUnmount: modules.trade.onUnmount,
         purchase_info: modules.trade.purchase_info,
-        symbol: modules.trade.symbol,
-        tradeComponentDidMount: modules.trade.tradeComponentDidMount,
-        tradeComponentWillUnmount: modules.trade.tradeComponentWillUnmount,
-        updateQueryString: modules.trade.updateQueryString,
-        is_mobile: ui.is_mobile
+        symbol: modules.trade.symbol
     };
 })(Trade);
 
@@ -22484,6 +22481,19 @@ Object.defineProperty(exports, "__esModule", {
 // list of trade's options that should be used in query string of trade page url.
 var allowed_query_string_variables = exports.allowed_query_string_variables = ['amount', 'barrier_1', 'barrier_2', 'basis', 'contract_start_type', 'contract_type', 'currency', 'duration', 'duration_unit', 'expiry_date', 'expiry_type', 'last_digit', 'start_date', 'symbol'];
 
+var non_proposal_query_string_variable = exports.non_proposal_query_string_variable = ['expiry_type', 'contract_start_type'];
+
+var proposal_properties_alternative_names = exports.proposal_properties_alternative_names = {
+    barrier: function barrier(is_digit) {
+        return is_digit ? 'last_digit' : 'barrier_1';
+    },
+    barrier2: 'barrier_2',
+    date_expiry: 'expiry_date',
+    date_start: 'start_date'
+};
+
+var removable_proposal_properties = exports.removable_proposal_properties = ['proposal', 'subscribe', 'passthrough', 'req_id'];
+
 /***/ }),
 /* 615 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -22757,7 +22767,7 @@ var extendOrReplace = function extendOrReplace(source, new_values) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.createProposalRequests = exports.getProposalInfo = undefined;
+exports.getProposalParametersName = exports.createProposalRequests = exports.getProposalInfo = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -22825,6 +22835,38 @@ var createProposalRequestForContract = function createProposalRequestForContract
         duration: parseInt(store.duration),
         duration_unit: store.duration_unit
     } : obj_expiry, (store.barrier_count > 0 || store.form_components.indexOf('last_digit') !== -1) && { barrier: store.barrier_1 || store.last_digit }, store.barrier_count === 2 && { barrier2: store.barrier_2 });
+};
+
+var getProposalParametersName = exports.getProposalParametersName = function getProposalParametersName(proposal_requests, alternatives, removable_properties) {
+    var is_digit = Object.keys(proposal_requests).findIndex(function (i) {
+        return i.toUpperCase().indexOf('DIGIT') > -1;
+    }) > -1;
+
+    var keys = Object.keys(proposal_requests[Object.keys(proposal_requests)[0]]);
+
+    Object.keys(alternatives).forEach(function (name) {
+        var index = keys.indexOf(name);
+        if (index > -1) {
+            keys.splice(index, 1);
+
+            if (typeof alternatives[name] === 'string') {
+                keys.push(name);
+            } else if (typeof alternatives[name] === 'function') {
+                keys.push(alternatives[name](is_digit));
+            }
+        }
+    });
+
+    removable_properties.forEach(function (name) {
+        var index = keys.indexOf(name);
+
+        if (index > -1) {
+            keys.splice(index, 1);
+        }
+    });
+
+    keys.sort();
+    return keys;
 };
 
 /***/ }),
@@ -23295,6 +23337,10 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
 
             var requests = (0, _proposal.createProposalRequests)(this);
             if (!(0, _utility.isEmptyObject)(requests)) {
+                var proper_proposal_params_for_query_string = (0, _proposal.getProposalParametersName)(requests, _query_string.proposal_properties_alternative_names, _query_string.removable_proposal_properties);
+
+                _url_helper2.default.pruneQueryString([].concat(_toConsumableArray(proper_proposal_params_for_query_string), _toConsumableArray(_query_string.non_proposal_query_string_variable)));
+
                 this.proposal_requests = requests;
                 this.proposal_info = {};
                 this.purchase_info = {};
@@ -23359,13 +23405,14 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
             }
         }
     }, {
-        key: 'tradeComponentDidMount',
-        value: function tradeComponentDidMount() {
+        key: 'onMount',
+        value: function onMount() {
             this.is_trade_component_mounted = true;
+            this.updateQueryString();
         }
     }, {
-        key: 'tradeComponentWillUnmount',
-        value: function tradeComponentWillUnmount() {
+        key: 'onUnmount',
+        value: function onUnmount() {
             this.is_trade_component_mounted = false;
         }
     }]);
@@ -23529,7 +23576,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     initializer: function initializer() {
         return {};
     }
-}), _applyDecoratedDescriptor(_class.prototype, 'init', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'init'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onChange', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'onChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoverPurchase', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoverPurchase'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onPurchase', [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, 'onPurchase'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onClickNewTrade', [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, 'onClickNewTrade'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'updateStore', [_dec6], Object.getOwnPropertyDescriptor(_class.prototype, 'updateStore'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'requestProposal', [_dec7], Object.getOwnPropertyDescriptor(_class.prototype, 'requestProposal'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onProposalResponse', [_dec8], Object.getOwnPropertyDescriptor(_class.prototype, 'onProposalResponse'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onChartBarrierChange', [_dec9], Object.getOwnPropertyDescriptor(_class.prototype, 'onChartBarrierChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'updateQueryString', [_dec10], Object.getOwnPropertyDescriptor(_class.prototype, 'updateQueryString'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'changeDurationValidationRules', [_dec11], Object.getOwnPropertyDescriptor(_class.prototype, 'changeDurationValidationRules'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'tradeComponentDidMount', [_dec12], Object.getOwnPropertyDescriptor(_class.prototype, 'tradeComponentDidMount'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'tradeComponentWillUnmount', [_dec13], Object.getOwnPropertyDescriptor(_class.prototype, 'tradeComponentWillUnmount'), _class.prototype)), _class));
+}), _applyDecoratedDescriptor(_class.prototype, 'init', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'init'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onChange', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'onChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoverPurchase', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoverPurchase'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onPurchase', [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, 'onPurchase'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onClickNewTrade', [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, 'onClickNewTrade'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'updateStore', [_dec6], Object.getOwnPropertyDescriptor(_class.prototype, 'updateStore'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'requestProposal', [_dec7], Object.getOwnPropertyDescriptor(_class.prototype, 'requestProposal'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onProposalResponse', [_dec8], Object.getOwnPropertyDescriptor(_class.prototype, 'onProposalResponse'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onChartBarrierChange', [_dec9], Object.getOwnPropertyDescriptor(_class.prototype, 'onChartBarrierChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'updateQueryString', [_dec10], Object.getOwnPropertyDescriptor(_class.prototype, 'updateQueryString'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'changeDurationValidationRules', [_dec11], Object.getOwnPropertyDescriptor(_class.prototype, 'changeDurationValidationRules'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMount', [_dec12], Object.getOwnPropertyDescriptor(_class.prototype, 'onMount'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onUnmount', [_dec13], Object.getOwnPropertyDescriptor(_class.prototype, 'onUnmount'), _class.prototype)), _class));
 exports.default = TradeStore;
 ;
 
@@ -24490,6 +24537,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _utility = __webpack_require__(3);
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -24587,6 +24636,26 @@ var URLHelper = function () {
             }
 
             return query_params;
+        }
+
+        /**
+         * Prunes the query string values
+         *
+         * @param {string[]} keys - A list of variable's name which should be in url's query string.
+         */
+
+    }, {
+        key: 'pruneQueryString',
+        value: function pruneQueryString() {
+            var keys = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+            var query_params = URLHelper.getQueryParams();
+
+            [].concat(_toConsumableArray(query_params)).forEach(function (value) {
+                return keys.indexOf(value[0]) <= -1 && query_params.delete(value[0]);
+            });
+
+            window.history.replaceState(null, null, '?' + query_params.toString());
         }
     }]);
 
