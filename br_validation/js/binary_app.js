@@ -4972,6 +4972,7 @@ var InputField = function InputField(_ref) {
                 e.target.value = is_empty || is_signed ? e.target.value : +e.target.value;
             } else if (!is_not_completed_number) {
                 e.target.value = value;
+                return;
             }
         }
 
