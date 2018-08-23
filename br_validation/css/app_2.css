@@ -3265,7 +3265,6 @@ a {
                 align-items: center; }
         .settings-dialog .settings-dialog-container .general-setting-container .settings-row span, .settings-dialog .settings-dialog-container .chart-setting-container .settings-row span {
           font-size: 12px;
-          text-transform: capitalize;
           color: #333; }
         .settings-dialog .settings-dialog-container .general-setting-container .settings-row:not(:last-child), .settings-dialog .settings-dialog-container .chart-setting-container .settings-row:not(:last-child) {
           border-bottom: 1px solid #e9e9ed; }
@@ -3942,8 +3941,6 @@ a {
 
 .info-box-container {
   position: absolute;
-  border: 1px solid #e9e9ed;
-  border-radius: 4px;
   z-index: 10;
   top: 10px;
   right: 10px;
@@ -3963,6 +3960,9 @@ a {
             transform: translateY(calc(-100% - 20px));
     opacity: 0; }
   .info-box-container .info-box {
+    position: relative;
+    border: 1px solid #e9e9ed;
+    border-radius: 4px;
     padding: 15px;
     background: rgba(255, 255, 255, 0.9);
     font-weight: 300; }
@@ -3991,6 +3991,10 @@ a {
         color: #f44336; }
       .info-box-container .info-box .expired.lost svg .color1-fill {
         fill: #f44336; }
+      .info-box-container .info-box .expired .sell-info {
+        margin-right: 20px;
+        text-align: center;
+        line-height: 1.2rem; }
     .info-box-container .info-box .general {
       display: -webkit-box;
       display: -ms-flexbox;
@@ -4012,9 +4016,14 @@ a {
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
         -webkit-box-align: center;
             -ms-flex-align: center;
                 align-items: center;
+        text-align: center;
         margin: -15px;
         margin-left: 15px;
         padding: 15px;
@@ -4080,6 +4089,26 @@ a {
             font-size: 0.6rem; }
       .info-box-container .info-box .digits .expired {
         margin-right: -25px; }
+  .info-box-container .message {
+    margin-top: 5px;
+    border: 1px solid #f44336;
+    border-radius: 4px;
+    padding: 10px;
+    background-color: rgba(244, 67, 54, 0.16);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center; }
+    .info-box-container .message .message-icon {
+      margin-right: 10px; }
+    .info-box-container .message .message-text {
+      -webkit-box-flex: 1;
+          -ms-flex-positive: 1;
+              flex-grow: 1; }
+    .info-box-container .message .message-close {
+      cursor: pointer; }
 
 .theme-wrapper.dark .contract-container {
   color: #aaacba; }
