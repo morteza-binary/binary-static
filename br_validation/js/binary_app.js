@@ -3189,7 +3189,7 @@ var BaseStore = (_class = (_temp = _class2 = function () {
     }, {
         key: 'validateProperty',
         value: function validateProperty(property, value) {
-            var validator = new _Validator2.default(this, _defineProperty({}, property, value !== undefined ? value : this[property]), _defineProperty({}, property, this.validation_rules[property]));
+            var validator = new _Validator2.default(_defineProperty({}, property, value !== undefined ? value : this[property]), _defineProperty({}, property, this.validation_rules[property]), this);
 
             validator.isPassed();
             this.setValidationErrorMessages(property, validator.errors.get(property));
@@ -4942,8 +4942,10 @@ var InputField = function InputField(_ref) {
     var className = _ref.className,
         error_messages = _ref.error_messages,
         helper = _ref.helper,
-        is_float = _ref.is_float,
         is_disabled = _ref.is_disabled,
+        is_float = _ref.is_float,
+        _ref$is_signed = _ref.is_signed,
+        is_signed = _ref$is_signed === undefined ? false : _ref$is_signed,
         label = _ref.label,
         name = _ref.name,
         onChange = _ref.onChange,
@@ -4956,18 +4958,38 @@ var InputField = function InputField(_ref) {
         value = _ref.value;
 
     var has_error = error_messages && error_messages.length;
+
+    var changeValue = function changeValue(e) {
+        if (type === 'number') {
+            var is_empty = !e.target.value || e.target.value === '';
+            var signed_regex = is_signed ? '[\\+-]?' : '';
+
+            var is_number = new RegExp('^' + signed_regex + '(\\d*)?' + (is_float ? '(\\.\\d+)?' : '') + '(?<=\\d)(?<!-0)$').test(e.target.value);
+
+            var is_not_completed_number = is_float && new RegExp('^' + signed_regex + '(\\.|\\d+\\.)?$').test(e.target.value);
+
+            if (is_number || is_empty) {
+                e.target.value = is_empty || is_signed ? e.target.value : +e.target.value;
+            } else if (!is_not_completed_number) {
+                e.target.value = value;
+            }
+        }
+
+        onChange(e);
+    };
+
     var input = _react2.default.createElement('input', {
         className: (0, _classnames2.default)({ error: has_error }),
-        type: type,
-        name: name,
-        step: is_float ? step : undefined,
-        placeholder: placeholder || undefined,
         disabled: is_disabled,
-        value: value,
-        onChange: onChange,
-        required: required || undefined,
+        'data-for': 'error_tooltip_' + name,
         'data-tip': true,
-        'data-for': 'error_tooltip_' + name
+        name: name,
+        onChange: changeValue,
+        placeholder: placeholder || undefined,
+        required: required || undefined,
+        step: is_float ? step : undefined,
+        type: type === 'number' ? 'text' : type,
+        value: value
     });
 
     return _react2.default.createElement(
@@ -5001,14 +5023,13 @@ var InputField = function InputField(_ref) {
 // ToDo: Refactor input_field
 // supports more than two different types of 'value' as a prop.
 // Quick Solution - Pass two different props to input field.
-
-// import ReactTooltip              from 'react-tooltip';
 InputField.propTypes = {
     className: _propTypes2.default.string,
     error_messages: _mobxReact.PropTypes.arrayOrObservableArray,
     helper: _propTypes2.default.bool,
     is_float: _propTypes2.default.bool,
     is_disabled: _propTypes2.default.string,
+    is_signed: _propTypes2.default.bool,
     label: _propTypes2.default.string,
     name: _propTypes2.default.string,
     onChange: _propTypes2.default.func,
@@ -18661,7 +18682,7 @@ var Amount = function Amount(_ref) {
                 is_nativepicker: is_nativepicker
             }),
             _react2.default.createElement(_input_field2.default, {
-                type: 'text',
+                type: 'number',
                 name: 'amount',
                 value: amount,
                 onChange: onChange,
@@ -18762,19 +18783,22 @@ var Barrier = function Barrier(_ref) {
             icon: 'barriers'
         },
         _react2.default.createElement(_input_field2.default, {
-            type: 'text',
+            type: 'number',
             name: 'barrier_1',
             value: barrier_1,
             onChange: onChange,
-            error_messages: validation_errors.barrier_1 || []
+            error_messages: validation_errors.barrier_1 || [],
+            is_float: true,
+            is_signed: true
         }),
         barrier_count === 2 && _react2.default.createElement(_input_field2.default, {
-            type: 'text',
+            type: 'number',
             name: 'barrier_2',
             value: barrier_2,
             onChange: onChange,
+            error_messages: validation_errors.barrier_2,
             is_float: true,
-            error_messages: validation_errors.barrier_2
+            is_signed: true
         })
     );
 };
@@ -18958,7 +18982,7 @@ var Duration = function Duration(_ref) {
                     is_nativepicker: is_nativepicker,
                     footer: (0, _localize.localize)('The minimum duration is 1 day')
                 }) : _react2.default.createElement(_input_field2.default, {
-                    type: 'text',
+                    type: 'number',
                     name: 'duration',
                     value: duration,
                     onChange: onChange,
@@ -23244,14 +23268,13 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
         value: function onChange(e) {
             var _e$target = e.target,
                 name = _e$target.name,
-                value = _e$target.value,
-                type = _e$target.type;
+                value = _e$target.value;
 
             if (!(name in this)) {
                 throw new Error('Invalid Argument: ' + name);
             }
 
-            this.processNewValuesAsync(_defineProperty({}, name, type === 'number' ? +value : value), true);
+            this.processNewValuesAsync(_defineProperty({}, name, value), true);
         }
     }, {
         key: 'onHoverPurchase',
@@ -24967,7 +24990,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Validator = function () {
-    function Validator(store, input, rules) {
+    function Validator(input, rules) {
+        var store = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
         _classCallCheck(this, Validator);
 
         this.input = input;
