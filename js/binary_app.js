@@ -4921,6 +4921,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var InputField = function InputField(_ref) {
     var className = _ref.className,
         error_messages = _ref.error_messages,
+        fractional_digits = _ref.fractional_digits,
         helper = _ref.helper,
         is_disabled = _ref.is_disabled,
         is_float = _ref.is_float,
@@ -4933,12 +4934,11 @@ var InputField = function InputField(_ref) {
         placeholder = _ref.placeholder,
         prefix = _ref.prefix,
         required = _ref.required,
-        _ref$step = _ref.step,
-        step = _ref$step === undefined ? '0.01' : _ref$step,
         type = _ref.type,
         value = _ref.value;
 
     var has_error = error_messages && error_messages.length;
+    var has_valid_length = true;
 
     var changeValue = function changeValue(e) {
         if (type === 'number') {
@@ -4949,10 +4949,15 @@ var InputField = function InputField(_ref) {
 
             var is_not_completed_number = is_float && new RegExp('^' + signed_regex + '(\\.|\\d+\\.)?$').test(e.target.value);
 
-            var is_zero = new RegExp('^' + signed_regex + '(0)?\\.[0]*$').test(e.target.value);
+            // This regex check whether there is any zero at the end of fractional part or not.
+            var has_zero_at_end = new RegExp('^' + signed_regex + '(\\d+)?\\.(\\d+)?[0]+$').test(e.target.value);
 
-            if (is_number || is_empty) {
-                e.target.value = is_empty || is_signed || is_zero ? e.target.value : +e.target.value;
+            if (max_length && fractional_digits) {
+                has_valid_length = new RegExp('^' + signed_regex + '(\\d{0,' + max_length + '})(\\.\\d{0,' + fractional_digits + '})?$').test(e.target.value);
+            }
+
+            if ((is_number || is_empty) && has_valid_length) {
+                e.target.value = is_empty || is_signed || has_zero_at_end ? e.target.value : +e.target.value;
             } else if (!is_not_completed_number) {
                 e.target.value = value;
                 return;
@@ -4967,12 +4972,11 @@ var InputField = function InputField(_ref) {
         disabled: is_disabled,
         'data-for': 'error_tooltip_' + name,
         'data-tip': true,
-        maxLength: max_length,
+        maxLength: fractional_digits ? max_length + fractional_digits + 1 : max_length,
         name: name,
         onChange: changeValue,
         placeholder: placeholder || undefined,
         required: required || undefined,
-        step: is_float ? step : undefined,
         type: type === 'number' ? 'text' : type,
         value: value
     });
@@ -5011,6 +5015,7 @@ var InputField = function InputField(_ref) {
 InputField.propTypes = {
     className: _propTypes2.default.string,
     error_messages: _mobxReact.PropTypes.arrayOrObservableArray,
+    fractional_digits: _propTypes2.default.number,
     helper: _propTypes2.default.bool,
     is_float: _propTypes2.default.bool,
     is_disabled: _propTypes2.default.string,
@@ -5022,7 +5027,6 @@ InputField.propTypes = {
     placeholder: _propTypes2.default.string,
     prefix: _propTypes2.default.string,
     required: _propTypes2.default.bool,
-    step: _propTypes2.default.string,
     type: _propTypes2.default.string,
     value: _propTypes2.default.oneOfType([_propTypes2.default.number, _propTypes2.default.string])
 };
@@ -5604,8 +5608,11 @@ var convertDurationLimit = function convertDurationLimit(value, unit) {
         var minute = value / 60;
         return minute >= 1 ? Math.floor(minute) : 1;
     } else if (unit === 'h') {
-        var hour = value / 3600;
+        var hour = value / (60 * 60);
         return hour >= 1 ? Math.floor(hour) : 1;
+    } else if (unit === 'd') {
+        var day = value / (60 * 60 * 24);
+        return day >= 1 ? Math.floor(day) : 1;
     }
 
     return value;
@@ -18950,6 +18957,7 @@ var Amount = function Amount(_ref) {
             }),
             _react2.default.createElement(_input_field2.default, {
                 error_messages: validation_errors.amount,
+                fractional_digits: (0, _currency_base.getDecimalPlaces)(currency),
                 is_float: true,
                 is_nativepicker: is_nativepicker,
                 max_length: 10,
@@ -22969,14 +22977,18 @@ var validation_rules = {
             return store.contract_expiry_type !== 'daily' && store.barrier_count;
         } }], ['number', { condition: function condition(store) {
             return store.contract_expiry_type === 'daily' && store.barrier_count;
-        }, type: 'float' }]],
+        }, type: 'float' }], ['custom', { func: function func(value, options, store) {
+            return store.barrier_count > 1 ? value > store.barrier_2 : true;
+        }, message: 'The higher barrier must be higher than the lower barrier.' }]],
     barrier_2: [['req', { condition: function condition(store) {
             return store.barrier_count > 1 && store.form_components.indexOf('barrier') > -1;
         }, message: 'The barrier is a required field.' }], ['barrier', { condition: function condition(store) {
             return store.contract_expiry_type !== 'daily' && store.barrier_count;
         } }], ['number', { condition: function condition(store) {
             return store.contract_expiry_type === 'daily' && store.barrier_count;
-        }, type: 'float' }]],
+        }, type: 'float' }], ['custom', { func: function func(value, options, store) {
+            return store.barrier_1 > value;
+        }, message: 'The lower barrier must be lower than the higher barrier.' }]],
     duration: [['req', { message: 'The duration is a required field.' }]]
 };
 
@@ -25461,7 +25473,7 @@ var Validator = function () {
                         return;
                     }
 
-                    var is_valid = ruleObject.validator(_this.input[attribute], ruleObject.options);
+                    var is_valid = ruleObject.validator(_this.input[attribute], ruleObject.options, _this.store);
 
                     if (!is_valid) {
                         _this.addFailure(attribute, ruleObject);
