@@ -21337,6 +21337,10 @@ var _client_base2 = _interopRequireDefault(_client_base);
 
 var _currency_base = __webpack_require__(/*! ../../../../_common/base/currency_base */ "./src/javascript/_common/base/currency_base.js");
 
+var _socket_base = __webpack_require__(/*! ../../../../_common/base/socket_base */ "./src/javascript/_common/base/socket_base.js");
+
+var _socket_base2 = _interopRequireDefault(_socket_base);
+
 var _utility = __webpack_require__(/*! ../../../../_common/utility */ "./src/javascript/_common/utility.js");
 
 var _Services = __webpack_require__(/*! ../../../Services */ "./src/javascript/app_2/Services/index.js");
@@ -21627,12 +21631,16 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
         key: 'init',
         value: function () {
             var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+                var _this3 = this;
+
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
                                 // To be sure that the website_status response has been received before processing trading page.
-                                _Services.WS.subscribeWebsiteStatus(this.prepareTradeStore);
+                                _socket_base2.default.wait('website_status').then(function () {
+                                    return _this3.prepareTradeStore();
+                                });
 
                             case 1:
                             case 'end':
@@ -21669,21 +21677,21 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     }, {
         key: 'onPurchase',
         value: function onPurchase(proposal_id, price, type) {
-            var _this3 = this;
+            var _this4 = this;
 
             if (proposal_id) {
                 (0, _purchase.processPurchase)(proposal_id, price).then((0, _mobx.action)(function (response) {
-                    if (_this3.proposal_info[type].id !== proposal_id) {
+                    if (_this4.proposal_info[type].id !== proposal_id) {
                         throw new Error('Proposal ID does not match.');
                     }
                     if (response.buy && !_client_base2.default.get('is_virtual')) {
-                        var contract_data = _extends({}, _this3.proposal_requests[type], _this3.proposal_info[type], {
+                        var contract_data = _extends({}, _this4.proposal_requests[type], _this4.proposal_info[type], {
                             buy_price: response.buy.buy_price
                         });
-                        _gtm2.default.pushPurchaseData(contract_data, _this3.root_store);
+                        _gtm2.default.pushPurchaseData(contract_data, _this4.root_store);
                     }
                     _Services.WS.forgetAll('proposal');
-                    _this3.purchase_info = response;
+                    _this4.purchase_info = response;
                 }));
             }
         }
@@ -21703,29 +21711,29 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     }, {
         key: 'updateStore',
         value: function updateStore(new_state) {
-            var _this4 = this;
+            var _this5 = this;
 
             Object.keys((0, _utility.cloneObject)(new_state)).forEach(function (key) {
                 if (key === 'root_store' || ['validation_rules', 'validation_errors'].indexOf(key) > -1) return;
-                if (JSON.stringify(_this4[key]) === JSON.stringify(new_state[key])) {
+                if (JSON.stringify(_this5[key]) === JSON.stringify(new_state[key])) {
                     delete new_state[key];
                 } else {
                     if (key === 'symbol') {
-                        _this4.is_purchase_enabled = false;
-                        _this4.is_trade_enabled = false;
+                        _this5.is_purchase_enabled = false;
+                        _this5.is_trade_enabled = false;
                     }
 
                     // Add changes to queryString of the url
-                    if (_query_string.allowed_query_string_variables.indexOf(key) !== -1 && _this4.is_trade_component_mounted) {
+                    if (_query_string.allowed_query_string_variables.indexOf(key) !== -1 && _this5.is_trade_component_mounted) {
                         _url_helper2.default.setQueryParam(_defineProperty({}, key, new_state[key]));
                     }
 
-                    _this4[key] = new_state[key];
+                    _this5[key] = new_state[key];
 
                     // validation is done in mobx intercept (base_store.js)
                     // when barrier_1 is set, it is compared with store.barrier_2 (which is not updated yet)
                     if (key === 'barrier_2' && new_state.barrier_1) {
-                        _this4.barrier_1 = new_state.barrier_1; // set it again, after barrier_2 is updated in store
+                        _this5.barrier_1 = new_state.barrier_1; // set it again, after barrier_2 is updated in store
                     }
                 }
             });
@@ -21817,7 +21825,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     }, {
         key: 'requestProposal',
         value: function requestProposal() {
-            var _this5 = this;
+            var _this6 = this;
 
             var requests = (0, _proposal.createProposalRequests)(this);
 
@@ -21840,8 +21848,8 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
                 this.purchase_info = {};
 
                 _Services.WS.forgetAll('proposal').then(function () {
-                    Object.keys(_this5.proposal_requests).forEach(function (type) {
-                        _Services.WS.subscribeProposal(_this5.proposal_requests[type], _this5.onProposalResponse);
+                    Object.keys(_this6.proposal_requests).forEach(function (type) {
+                        _Services.WS.subscribeProposal(_this6.proposal_requests[type], _this6.onProposalResponse);
                     });
                 });
             }
