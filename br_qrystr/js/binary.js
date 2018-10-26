@@ -725,8 +725,8 @@ var getPaWithdrawalLimit = function getPaWithdrawalLimit(currency, limit) {
 };
 
 var getCurrencyName = function getCurrencyName(currency) {
-    return localize(getPropertyValue(crypto_config, [currency, 'name']) || '');
-};
+    return localize(getPropertyValue(crypto_config, [currency, 'name']) || '' /* localize-ignore */);
+}; // to refactor on master
 
 var getMinPayout = function getMinPayout(currency) {
     return getPropertyValue(currencies_config, [currency, 'stake_default']);
@@ -1128,9 +1128,11 @@ module.exports = NetworkMonitorBase;
 
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 var BinarySocket = __webpack_require__(/*! ./socket_base */ "./src/javascript/_common/base/socket_base.js");
+var PromiseClass = __webpack_require__(/*! ../utility */ "./src/javascript/_common/utility.js").PromiseClass;
 
 var ServerTime = function () {
     var clock_started = false;
+    var pending = new PromiseClass();
     var server_time = void 0,
         client_time = void 0,
         get_time_interval = void 0,
@@ -1174,6 +1176,7 @@ var ServerTime = function () {
             }
         };
         updateTime();
+        pending.resolve();
         update_time_interval = setInterval(updateTime, 1000);
     };
 
@@ -1183,7 +1186,8 @@ var ServerTime = function () {
 
     return {
         init: init,
-        get: get
+        get: get,
+        timePromise: pending.promise
     };
 }();
 
@@ -1203,8 +1207,6 @@ module.exports = ServerTime;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var ClientBase = __webpack_require__(/*! ./client_base */ "./src/javascript/_common/base/client_base.js");
 var SocketCache = __webpack_require__(/*! ./socket_cache */ "./src/javascript/_common/base/socket_cache.js");
 var getLanguage = __webpack_require__(/*! ../language */ "./src/javascript/_common/language.js").get;
@@ -1212,6 +1214,7 @@ var State = __webpack_require__(/*! ../storage */ "./src/javascript/_common/stor
 var cloneObject = __webpack_require__(/*! ../utility */ "./src/javascript/_common/utility.js").cloneObject;
 var getPropertyValue = __webpack_require__(/*! ../utility */ "./src/javascript/_common/utility.js").getPropertyValue;
 var isEmptyObject = __webpack_require__(/*! ../utility */ "./src/javascript/_common/utility.js").isEmptyObject;
+var PromiseClass = __webpack_require__(/*! ../utility */ "./src/javascript/_common/utility.js").PromiseClass;
 var getAppId = __webpack_require__(/*! ../../config */ "./src/javascript/config.js").getAppId;
 var getSocketURL = __webpack_require__(/*! ../../config */ "./src/javascript/config.js").getSocketURL;
 
@@ -1523,17 +1526,6 @@ var BinarySocketBase = function () {
         }
     };
 }();
-
-var PromiseClass = function PromiseClass() {
-    var _this = this;
-
-    _classCallCheck(this, PromiseClass);
-
-    this.promise = new Promise(function (resolve, reject) {
-        _this.reject = reject;
-        _this.resolve = resolve;
-    });
-};
 
 module.exports = BinarySocketBase;
 
@@ -8398,6 +8390,8 @@ module.exports = Url;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var extend = __webpack_require__(/*! extend */ "./node_modules/extend/index.js");
 __webpack_require__(/*! ./lib/polyfills/element.matches */ "./src/javascript/_common/lib/polyfills/element.matches.js");
 
@@ -8621,6 +8615,17 @@ var getStaticHash = function getStaticHash() {
     return static_hash;
 };
 
+var PromiseClass = function PromiseClass() {
+    var _this = this;
+
+    _classCallCheck(this, PromiseClass);
+
+    this.promise = new Promise(function (resolve, reject) {
+        _this.reject = reject;
+        _this.resolve = resolve;
+    });
+};
+
 module.exports = {
     showLoadingImage: showLoadingImage,
     getHighestZIndex: getHighestZIndex,
@@ -8635,7 +8640,8 @@ module.exports = {
     createElement: createElement,
     applyToAllElements: applyToAllElements,
     findParent: findParent,
-    getStaticHash: getStaticHash
+    getStaticHash: getStaticHash,
+    PromiseClass: PromiseClass
 };
 
 /***/ }),
@@ -33018,6 +33024,7 @@ var getAppId = function getAppId() {
     var app_id = null;
     var user_app_id = ''; // you can insert Application ID of your registered application here
     var config_app_id = window.localStorage.getItem('config.app_id');
+    var is_new_app = /\/app\//.test(window.location.pathname);
     if (config_app_id) {
         app_id = config_app_id;
     } else if (/staging\.binary\.com/i.test(window.location.hostname)) {
@@ -33028,6 +33035,9 @@ var getAppId = function getAppId() {
         app_id = user_app_id;
     } else if (/localhost/i.test(window.location.hostname)) {
         app_id = 1159;
+    } else if (is_new_app) {
+        window.localStorage.removeItem('config.default_app_id');
+        app_id = 15265;
     } else {
         window.localStorage.removeItem('config.default_app_id');
         app_id = 1;
