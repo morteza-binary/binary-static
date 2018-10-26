@@ -19364,6 +19364,7 @@ var ChartBarrierStore = exports.ChartBarrierStore = (_dec = _mobx.action.bound, 
     _createClass(ChartBarrierStore, [{
         key: 'updateBarriers',
         value: function updateBarriers(high, low) {
+            this.relative = /^[+-]/.test(high);
             this.high = +high || undefined;
             this.low = +low || undefined;
         }
