@@ -6519,6 +6519,18 @@ Object.keys(_login_button).forEach(function (key) {
   });
 });
 
+var _install_pwa_button = __webpack_require__(/*! ./install_pwa_button.jsx */ "./src/javascript/app_2/App/Components/Layout/Header/install_pwa_button.jsx");
+
+Object.keys(_install_pwa_button).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _install_pwa_button[key];
+    }
+  });
+});
+
 var _menu_links = __webpack_require__(/*! ./menu_links.jsx */ "./src/javascript/app_2/App/Components/Layout/Header/menu_links.jsx");
 
 Object.keys(_menu_links).forEach(function (key) {
@@ -6554,6 +6566,61 @@ Object.keys(_toggle_notifications_drawer).forEach(function (key) {
     }
   });
 });
+
+/***/ }),
+
+/***/ "./src/javascript/app_2/App/Components/Layout/Header/install_pwa_button.jsx":
+/*!**********************************************************************************!*\
+  !*** ./src/javascript/app_2/App/Components/Layout/Header/install_pwa_button.jsx ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.InstallPWAButton = undefined;
+
+var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _localize = __webpack_require__(/*! ../../../../../_common/localize */ "./src/javascript/_common/localize.js");
+
+var _button = __webpack_require__(/*! ../../Form/button.jsx */ "./src/javascript/app_2/App/Components/Form/button.jsx");
+
+var _button2 = _interopRequireDefault(_button);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var InstallPWAButton = function InstallPWAButton() {
+
+    var showPrompt = function showPrompt() {
+        if (window.pwa_prompt) {
+            window.pwa_prompt.prompt();
+
+            window.pwa_prompt.userChoice.then(function (choice_result) {
+                if (choice_result.outcome === 'accepted') {
+                    console.log('User accepted to install the app'); // eslint-disable-line no-console
+                } else {
+                    console.log('User dimissed to install the app'); // eslint-disable-line no-console
+                }
+            });
+        }
+    };
+
+    return _react2.default.createElement(_button2.default, {
+        className: 'secondary white',
+        has_effect: true,
+        text: (0, _localize.localize)('Install'),
+        onClick: showPrompt
+    });
+};
+
+exports.InstallPWAButton = InstallPWAButton;
 
 /***/ }),
 
@@ -7590,7 +7657,8 @@ var Header = function Header(_ref) {
                             is_dialog_on: is_acc_switcher_on,
                             toggleDialog: toggleAccountsDialog
                         })
-                    ) : _react2.default.createElement(_Header.LoginButton, null)
+                    ) : _react2.default.createElement(_Header.LoginButton, null),
+                    _react2.default.createElement(_Header.InstallPWAButton, null)
                 )
             ),
             _react2.default.createElement(_Header.ToggleNotificationsDrawer, null)
@@ -24634,6 +24702,14 @@ window.addEventListener('pageshow', function (e) {
     if (e.persisted) {
         (0, _app2.default)();
     }
+});
+
+window.addEventListener('beforeinstallprompt', function (e) {
+    console.log('Going to show the installation prompt'); // eslint-disable-line no-console
+
+    // e.preventDefault();
+
+    window.pwa_prompt = e;
 });
 
 (0, _pwa2.default)();
