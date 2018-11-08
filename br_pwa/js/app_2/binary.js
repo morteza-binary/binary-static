@@ -24702,7 +24702,9 @@ function register() {
     // Register the service worker
     if ( /* process.env.NODE_ENV === 'production' && */'serviceWorker' in navigator) {
         window.addEventListener('load', function () {
-            var swUrl = 'service-worker.js';
+            var path_name = window.location.pathname;
+            path_name = /index\.html/g.test(path_name) ? window.location.pathname.replace('index.html', '') : '';
+            var swUrl = path_name + 'service-worker.js';
             navigator.serviceWorker.register(swUrl).then(function (registration) {
                 registration.onupdatefound = function () {
                     var installingWorker = registration.installing;
