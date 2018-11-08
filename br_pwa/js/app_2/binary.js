@@ -6588,6 +6588,10 @@ var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _localize = __webpack_require__(/*! ../../../../../_common/localize */ "./src/javascript/_common/localize.js");
 
 var _button = __webpack_require__(/*! ../../Form/button.jsx */ "./src/javascript/app_2/App/Components/Form/button.jsx");
@@ -6596,28 +6600,34 @@ var _button2 = _interopRequireDefault(_button);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var InstallPWAButton = function InstallPWAButton() {
+var InstallPWAButton = function InstallPWAButton(_ref) {
+    var prompt_event = _ref.prompt_event,
+        onClick = _ref.onClick;
+
 
     var showPrompt = function showPrompt() {
-        if (window.pwa_prompt) {
-            window.pwa_prompt.prompt();
+        if (prompt_event) {
+            prompt_event.prompt();
 
-            window.pwa_prompt.userChoice.then(function (choice_result) {
+            prompt_event.userChoice.then(function (choice_result) {
                 if (choice_result.outcome === 'accepted') {
-                    console.log('User accepted to install the app'); // eslint-disable-line no-console
-                } else {
-                    console.log('User dimissed to install the app'); // eslint-disable-line no-console
+                    onClick();
                 }
             });
         }
     };
 
     return _react2.default.createElement(_button2.default, {
-        className: 'secondary white',
+        className: 'primary orang',
         has_effect: true,
         text: (0, _localize.localize)('Install'),
         onClick: showPrompt
     });
+};
+
+InstallPWAButton.propTypes = {
+    onClick: _propTypes2.default.func,
+    prompt_event: _propTypes2.default.object
 };
 
 exports.InstallPWAButton = InstallPWAButton;
@@ -7621,12 +7631,28 @@ var Header = function Header(_ref) {
     var balance = _ref.balance,
         can_upgrade = _ref.can_upgrade,
         currency = _ref.currency,
-        loginid = _ref.loginid,
+        hideInstallButton = _ref.hideInstallButton,
         is_acc_switcher_on = _ref.is_acc_switcher_on,
+        is_install_button_visible = _ref.is_install_button_visible,
         is_logged_in = _ref.is_logged_in,
         is_mobile = _ref.is_mobile,
+        loginid = _ref.loginid,
         onClickUpgrade = _ref.onClickUpgrade,
+        pwa_prompt_event = _ref.pwa_prompt_event,
+        setPWAPromptEvent = _ref.setPWAPromptEvent,
+        showInstallButton = _ref.showInstallButton,
         toggleAccountsDialog = _ref.toggleAccountsDialog;
+
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+        console.log('Going to show the installation prompt'); // eslint-disable-line no-console
+
+        e.preventDefault();
+
+        setPWAPromptEvent(e);
+        showInstallButton();
+    });
+
     return _react2.default.createElement(
         'header',
         { className: 'header' },
@@ -7645,6 +7671,10 @@ var Header = function Header(_ref) {
                 _react2.default.createElement(
                     'div',
                     { className: 'acc-balance-container' },
+                    is_install_button_visible && _react2.default.createElement(_Header.InstallPWAButton, {
+                        prompt_event: pwa_prompt_event,
+                        onClick: hideInstallButton
+                    }),
                     is_logged_in ? _react2.default.createElement(
                         _react2.default.Fragment,
                         null,
@@ -7657,8 +7687,7 @@ var Header = function Header(_ref) {
                             is_dialog_on: is_acc_switcher_on,
                             toggleDialog: toggleAccountsDialog
                         })
-                    ) : _react2.default.createElement(_Header.LoginButton, null),
-                    _react2.default.createElement(_Header.InstallPWAButton, null)
+                    ) : _react2.default.createElement(_Header.LoginButton, null)
                 )
             ),
             _react2.default.createElement(_Header.ToggleNotificationsDrawer, null)
@@ -7670,12 +7699,17 @@ Header.propTypes = {
     balance: _propTypes2.default.string,
     can_upgrade: _propTypes2.default.bool,
     currency: _propTypes2.default.string,
+    hideInstallButton: _propTypes2.default.func,
     is_acc_switcher_on: _propTypes2.default.bool,
     is_dark_mode: _propTypes2.default.bool, // TODO: add dark theme handler
+    is_install_button_visible: _propTypes2.default.bool,
     is_logged_in: _propTypes2.default.bool,
     is_mobile: _propTypes2.default.bool,
     loginid: _propTypes2.default.string,
     onClickUpgrade: _propTypes2.default.func, // TODO: add click handler
+    pwa_prompt_event: _propTypes2.default.object,
+    setPWAPromptEvent: _propTypes2.default.func,
+    showInstallButton: _propTypes2.default.func,
     toggleAccountsDialog: _propTypes2.default.func
 };
 
@@ -7690,9 +7724,14 @@ exports.default = (0, _reactRouter.withRouter)((0, _connect.connect)(function (_
         currency: client.currency,
         is_logged_in: client.is_logged_in,
         loginid: client.loginid,
+        hideInstallButton: ui.hideInstallButton,
         is_acc_switcher_on: ui.is_accounts_switcher_on,
         is_dark_mode: ui.is_dark_mode_on,
+        is_install_button_visible: ui.is_install_button_visible,
         is_mobile: ui.is_mobile,
+        pwa_prompt_event: ui.pwa_prompt_event,
+        setPWAPromptEvent: ui.setPWAPromptEvent,
+        showInstallButton: ui.showInstallButton,
         toggleAccountsDialog: ui.toggleAccountsDialog
     };
 })(Header));
@@ -23268,7 +23307,7 @@ exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13;
+var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15;
 
 var _mobx = __webpack_require__(/*! mobx */ "./node_modules/mobx/lib/mobx.module.js");
 
@@ -23329,7 +23368,7 @@ function _initializerWarningHelper(descriptor, context) {
     throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
-var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _mobx.action.bound, _dec4 = _mobx.action.bound, _dec5 = _mobx.action.bound, _dec6 = _mobx.action.bound, _dec7 = _mobx.action.bound, _dec8 = _mobx.action.bound, _dec9 = _mobx.action.bound, _dec10 = _mobx.action.bound, _dec11 = _mobx.action.bound, _dec12 = _mobx.action.bound, _dec13 = _mobx.action.bound, _dec14 = _mobx.action.bound, _dec15 = _mobx.action.bound, (_class = function (_BaseStore) {
+var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _mobx.action.bound, _dec4 = _mobx.action.bound, _dec5 = _mobx.action.bound, _dec6 = _mobx.action.bound, _dec7 = _mobx.action.bound, _dec8 = _mobx.action.bound, _dec9 = _mobx.action.bound, _dec10 = _mobx.action.bound, _dec11 = _mobx.action.bound, _dec12 = _mobx.action.bound, _dec13 = _mobx.action.bound, _dec14 = _mobx.action.bound, _dec15 = _mobx.action.bound, _dec16 = _mobx.action.bound, _dec17 = _mobx.action.bound, _dec18 = _mobx.action.bound, (_class = function (_BaseStore) {
     _inherits(UIStore, _BaseStore);
 
     // SmartCharts Controls
@@ -23367,7 +23406,11 @@ var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _m
 
         _initDefineProp(_this, 'is_chart_layout_default', _descriptor12, _this);
 
-        _initDefineProp(_this, 'screen_width', _descriptor13, _this);
+        _initDefineProp(_this, 'is_install_button_visible', _descriptor13, _this);
+
+        _initDefineProp(_this, 'pwa_prompt_event', _descriptor14, _this);
+
+        _initDefineProp(_this, 'screen_width', _descriptor15, _this);
 
         window.addEventListener('resize', _this.handleResize);
         (0, _mobx.autorun)(function () {
@@ -23375,6 +23418,9 @@ var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _m
         });
         return _this;
     }
+
+    // PWA event and config
+
 
     _createClass(UIStore, [{
         key: 'handleResize',
@@ -23461,6 +23507,22 @@ var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _m
             this.is_notifications_drawer_on = false;
         }
     }, {
+        key: 'showInstallButton',
+        value: function showInstallButton() {
+            this.is_install_button_visible = true;
+        }
+    }, {
+        key: 'hideInstallButton',
+        value: function hideInstallButton() {
+            this.is_install_button_visible = false;
+            this.pwa_prompt_event = null;
+        }
+    }, {
+        key: 'setPWAPromptEvent',
+        value: function setPWAPromptEvent(e) {
+            this.pwa_prompt_event = e;
+        }
+    }, {
         key: 'is_mobile',
         get: function get() {
             return this.screen_width <= _ui.MAX_MOBILE_WIDTH;
@@ -23533,12 +23595,22 @@ var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _m
     initializer: function initializer() {
         return true;
     }
-}), _descriptor13 = _applyDecoratedDescriptor(_class.prototype, 'screen_width', [_mobx.observable], {
+}), _descriptor13 = _applyDecoratedDescriptor(_class.prototype, 'is_install_button_visible', [_mobx.observable], {
+    enumerable: true,
+    initializer: function initializer() {
+        return false;
+    }
+}), _descriptor14 = _applyDecoratedDescriptor(_class.prototype, 'pwa_prompt_event', [_mobx.observable], {
+    enumerable: true,
+    initializer: function initializer() {
+        return null;
+    }
+}), _descriptor15 = _applyDecoratedDescriptor(_class.prototype, 'screen_width', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return window.innerWidth;
     }
-}), _applyDecoratedDescriptor(_class.prototype, 'handleResize', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'handleResize'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'is_mobile', [_mobx.computed], Object.getOwnPropertyDescriptor(_class.prototype, 'is_mobile'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'is_tablet', [_mobx.computed], Object.getOwnPropertyDescriptor(_class.prototype, 'is_tablet'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleAccountsDialog', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleAccountsDialog'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleChartLayout', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleChartLayout'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleChartAssetInfo', [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleChartAssetInfo'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleChartCountdown', [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleChartCountdown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'togglePurchaseLock', [_dec6], Object.getOwnPropertyDescriptor(_class.prototype, 'togglePurchaseLock'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'togglePurchaseConfirmation', [_dec7], Object.getOwnPropertyDescriptor(_class.prototype, 'togglePurchaseConfirmation'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleDarkMode', [_dec8], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleDarkMode'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleSettingsDialog', [_dec9], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleSettingsDialog'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'showLanguageDialog', [_dec10], Object.getOwnPropertyDescriptor(_class.prototype, 'showLanguageDialog'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'hideLanguageDialog', [_dec11], Object.getOwnPropertyDescriptor(_class.prototype, 'hideLanguageDialog'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'togglePortfolioDrawer', [_dec12], Object.getOwnPropertyDescriptor(_class.prototype, 'togglePortfolioDrawer'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'showMainDrawer', [_dec13], Object.getOwnPropertyDescriptor(_class.prototype, 'showMainDrawer'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'showNotificationsDrawer', [_dec14], Object.getOwnPropertyDescriptor(_class.prototype, 'showNotificationsDrawer'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'hideDrawers', [_dec15], Object.getOwnPropertyDescriptor(_class.prototype, 'hideDrawers'), _class.prototype)), _class));
+}), _applyDecoratedDescriptor(_class.prototype, 'handleResize', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'handleResize'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'is_mobile', [_mobx.computed], Object.getOwnPropertyDescriptor(_class.prototype, 'is_mobile'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'is_tablet', [_mobx.computed], Object.getOwnPropertyDescriptor(_class.prototype, 'is_tablet'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleAccountsDialog', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleAccountsDialog'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleChartLayout', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleChartLayout'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleChartAssetInfo', [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleChartAssetInfo'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleChartCountdown', [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleChartCountdown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'togglePurchaseLock', [_dec6], Object.getOwnPropertyDescriptor(_class.prototype, 'togglePurchaseLock'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'togglePurchaseConfirmation', [_dec7], Object.getOwnPropertyDescriptor(_class.prototype, 'togglePurchaseConfirmation'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleDarkMode', [_dec8], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleDarkMode'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'toggleSettingsDialog', [_dec9], Object.getOwnPropertyDescriptor(_class.prototype, 'toggleSettingsDialog'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'showLanguageDialog', [_dec10], Object.getOwnPropertyDescriptor(_class.prototype, 'showLanguageDialog'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'hideLanguageDialog', [_dec11], Object.getOwnPropertyDescriptor(_class.prototype, 'hideLanguageDialog'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'togglePortfolioDrawer', [_dec12], Object.getOwnPropertyDescriptor(_class.prototype, 'togglePortfolioDrawer'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'showMainDrawer', [_dec13], Object.getOwnPropertyDescriptor(_class.prototype, 'showMainDrawer'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'showNotificationsDrawer', [_dec14], Object.getOwnPropertyDescriptor(_class.prototype, 'showNotificationsDrawer'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'hideDrawers', [_dec15], Object.getOwnPropertyDescriptor(_class.prototype, 'hideDrawers'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'showInstallButton', [_dec16], Object.getOwnPropertyDescriptor(_class.prototype, 'showInstallButton'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'hideInstallButton', [_dec17], Object.getOwnPropertyDescriptor(_class.prototype, 'hideInstallButton'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'setPWAPromptEvent', [_dec18], Object.getOwnPropertyDescriptor(_class.prototype, 'setPWAPromptEvent'), _class.prototype)), _class));
 exports.default = UIStore;
 
 /***/ }),
@@ -24702,14 +24774,6 @@ window.addEventListener('pageshow', function (e) {
     if (e.persisted) {
         (0, _app2.default)();
     }
-});
-
-window.addEventListener('beforeinstallprompt', function (e) {
-    console.log('Going to show the installation prompt'); // eslint-disable-line no-console
-
-    // e.preventDefault();
-
-    window.pwa_prompt = e;
 });
 
 (0, _pwa2.default)();
