@@ -6507,18 +6507,6 @@ Object.keys(_account_info).forEach(function (key) {
   });
 });
 
-var _login_button = __webpack_require__(/*! ./login_button.jsx */ "./src/javascript/app_2/App/Components/Layout/Header/login_button.jsx");
-
-Object.keys(_login_button).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _login_button[key];
-    }
-  });
-});
-
 var _install_pwa_button = __webpack_require__(/*! ./install_pwa_button.jsx */ "./src/javascript/app_2/App/Components/Layout/Header/install_pwa_button.jsx");
 
 Object.keys(_install_pwa_button).forEach(function (key) {
@@ -6527,6 +6515,18 @@ Object.keys(_install_pwa_button).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _install_pwa_button[key];
+    }
+  });
+});
+
+var _login_button = __webpack_require__(/*! ./login_button.jsx */ "./src/javascript/app_2/App/Components/Layout/Header/login_button.jsx");
+
+Object.keys(_login_button).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _login_button[key];
     }
   });
 });
