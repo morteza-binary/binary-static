@@ -25242,6 +25242,10 @@ window.addEventListener('pageshow', function (e) {
     }
 });
 
+window.addEventListener('beforeinstallprompt', function () {
+    console.log('main --- Going to show the installation prompt'); // eslint-disable-line no-console
+});
+
 (0, _pwa2.default)();
 
 /***/ }),
