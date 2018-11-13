@@ -1,0 +1,9 @@
+{
+  "binary.min.js": "/autid/js/app_2/binary.min.js",
+  "binary.min.js.map": "/autid/js/app_2/binary.min.js.map",
+  "binary_common.js": "/autid/js/app_2/binary_common.min.js",
+  "binary_common.js.map": "/autid/js/app_2/binary_common.min.js.map",
+  "react_mobx.js": "/autid/js/app_2/react_mobx.min.js",
+  "smartcharts.js": "/autid/js/app_2/smartcharts.min.js",
+  "vendor.js": "/autid/js/app_2/vendor.min.js"
+}
