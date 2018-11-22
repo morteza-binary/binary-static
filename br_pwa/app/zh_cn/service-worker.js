@@ -37,7 +37,7 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["/Users/morteza/Projects/Binary/binary-static/dist/br_pwa/app/jsbinary.js","5b52ee24df0735cbffb9518c344c5d51"],["/Users/morteza/Projects/Binary/binary-static/dist/br_pwa/app/jsbinary_common.min.js","8f3a9d895d1b780959c1c04c39fa785e"],["/Users/morteza/Projects/Binary/binary-static/dist/br_pwa/app/jsreact_mobx.min.js","3cc436a41fb7b3e317603b80ab04523d"],["/Users/morteza/Projects/Binary/binary-static/dist/br_pwa/app/jssmartcharts.min.js","cc1bececf6371ce7370185729164e94e"],["/Users/morteza/Projects/Binary/binary-static/dist/br_pwa/app/jsvendor.min.js","f36b7894b4c044688735b323741413e8"]];
+var precacheConfig = [["\n        /br_pwa\n        /js/app_2binary.js","20fb04ead6888d3e7cf705a985d0abab"],["\n        /br_pwa\n        /js/app_2binary_common.min.js","8f3a9d895d1b780959c1c04c39fa785e"],["\n        /br_pwa\n        /js/app_2react_mobx.min.js","3cc436a41fb7b3e317603b80ab04523d"],["\n        /br_pwa\n        /js/app_2smartcharts.min.js","cc1bececf6371ce7370185729164e94e"],["\n        /br_pwa\n        /js/app_2vendor.min.js","f36b7894b4c044688735b323741413e8"]];
 var cacheName = 'sw-precache-v3-sw-precache-webpack-plugin-' + (self.registration ? self.registration.scope : '');
 
 
