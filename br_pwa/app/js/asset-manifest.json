@@ -1,0 +1,9 @@
+{
+  "binary.js": "() => (\n    (global.is_production || grunt.file.exists(PATHS.ROOT, 'scripts/CNAME') ? '' : '/binary-static') +\n    (global.branch ? `/${global.branch_prefix}${global.branch}` : '') +\n    '/js/'\n)binary.js",
+  "binary.js.map": "() => (\n    (global.is_production || grunt.file.exists(PATHS.ROOT, 'scripts/CNAME') ? '' : '/binary-static') +\n    (global.branch ? `/${global.branch_prefix}${global.branch}` : '') +\n    '/js/'\n)binary.js.map",
+  "binary_common.js": "() => (\n    (global.is_production || grunt.file.exists(PATHS.ROOT, 'scripts/CNAME') ? '' : '/binary-static') +\n    (global.branch ? `/${global.branch_prefix}${global.branch}` : '') +\n    '/js/'\n)binary_common.min.js",
+  "binary_common.js.map": "() => (\n    (global.is_production || grunt.file.exists(PATHS.ROOT, 'scripts/CNAME') ? '' : '/binary-static') +\n    (global.branch ? `/${global.branch_prefix}${global.branch}` : '') +\n    '/js/'\n)binary_common.min.js.map",
+  "react_mobx.js": "() => (\n    (global.is_production || grunt.file.exists(PATHS.ROOT, 'scripts/CNAME') ? '' : '/binary-static') +\n    (global.branch ? `/${global.branch_prefix}${global.branch}` : '') +\n    '/js/'\n)react_mobx.min.js",
+  "smartcharts.js": "() => (\n    (global.is_production || grunt.file.exists(PATHS.ROOT, 'scripts/CNAME') ? '' : '/binary-static') +\n    (global.branch ? `/${global.branch_prefix}${global.branch}` : '') +\n    '/js/'\n)smartcharts.min.js",
+  "vendor.js": "() => (\n    (global.is_production || grunt.file.exists(PATHS.ROOT, 'scripts/CNAME') ? '' : '/binary-static') +\n    (global.branch ? `/${global.branch_prefix}${global.branch}` : '') +\n    '/js/'\n)vendor.min.js"
+}
