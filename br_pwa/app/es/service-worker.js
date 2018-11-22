@@ -37,7 +37,7 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["/br_pwa/js/binary.js","fbf7eb57bdc2f875205af5e4a30f051d"],["/br_pwa/js/binary_common.min.js","8f3a9d895d1b780959c1c04c39fa785e"],["/br_pwa/js/react_mobx.min.js","3cc436a41fb7b3e317603b80ab04523d"],["/br_pwa/js/smartcharts.min.js","cc1bececf6371ce7370185729164e94e"],["/br_pwa/js/vendor.min.js","f36b7894b4c044688735b323741413e8"]];
+var precacheConfig = [["/br_pwa/app/js/binary.js","7ecab790c7cc9fcff4822af23e6f414e"],["/br_pwa/app/js/binary_common.min.js","8f3a9d895d1b780959c1c04c39fa785e"],["/br_pwa/app/js/react_mobx.min.js","3cc436a41fb7b3e317603b80ab04523d"],["/br_pwa/app/js/smartcharts.min.js","cc1bececf6371ce7370185729164e94e"],["/br_pwa/app/js/vendor.min.js","f36b7894b4c044688735b323741413e8"]];
 var cacheName = 'sw-precache-v3-sw-precache-webpack-plugin-' + (self.registration ? self.registration.scope : '');
 
 

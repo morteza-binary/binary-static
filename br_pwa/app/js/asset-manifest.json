@@ -1,9 +1,9 @@
 {
-  "binary.js": "/br_pwa/js/binary.js",
-  "binary.js.map": "/br_pwa/js/binary.js.map",
-  "binary_common.js": "/br_pwa/js/binary_common.min.js",
-  "binary_common.js.map": "/br_pwa/js/binary_common.min.js.map",
-  "react_mobx.js": "/br_pwa/js/react_mobx.min.js",
-  "smartcharts.js": "/br_pwa/js/smartcharts.min.js",
-  "vendor.js": "/br_pwa/js/vendor.min.js"
+  "binary.js": "/br_pwa/app/js/binary.js",
+  "binary.js.map": "/br_pwa/app/js/binary.js.map",
+  "binary_common.js": "/br_pwa/app/js/binary_common.min.js",
+  "binary_common.js.map": "/br_pwa/app/js/binary_common.min.js.map",
+  "react_mobx.js": "/br_pwa/app/js/react_mobx.min.js",
+  "smartcharts.js": "/br_pwa/app/js/smartcharts.min.js",
+  "vendor.js": "/br_pwa/app/js/vendor.min.js"
 }
