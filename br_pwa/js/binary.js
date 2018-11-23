@@ -8490,7 +8490,7 @@ var ThirdPartyLinks = function () {
 
     var clickHandler = function clickHandler(e) {
         if (!e.target) return;
-        var el_link = e.target.closest('a');
+        var el_link = e.target.closest('a') || e.target.closest('area');
         if (!el_link) return;
 
         var href = el_link.href;
@@ -9372,6 +9372,7 @@ module.exports = pages_config;
 
 
 var defaultRedirectUrl = __webpack_require__(/*! ./client */ "./src/javascript/app/base/client.js").defaultRedirectUrl;
+var isLoggedIn = __webpack_require__(/*! ./client */ "./src/javascript/app/base/client.js").isLoggedIn;
 var getElementById = __webpack_require__(/*! ../../_common/common_functions */ "./src/javascript/_common/common_functions.js").getElementById;
 var getLanguage = __webpack_require__(/*! ../../_common/language */ "./src/javascript/_common/language.js").get;
 var State = __webpack_require__(/*! ../../_common/storage */ "./src/javascript/_common/storage.js").State;
@@ -9463,6 +9464,12 @@ var BinaryPjax = function () {
         // check if url is not same as current or if url has `anchor` query
         if (location.href !== url || Url.paramsHash().anchor) {
             processUrl(url);
+        }
+
+        // workaround to remove non-error notification msg for chrome bug where users logout from different browser window
+        var msg_notification_el = getElementById('msg_notification');
+        if (!isLoggedIn() && !msg_notification_el.classList.contains('error')) {
+            msg_notification_el.setVisibility(0);
         }
     };
 
@@ -9643,6 +9650,15 @@ var Client = function () {
                 }
             });
         } else {
+            applyToAllElements('.client_logged_in', function (el) {
+                el.setVisibility(0);
+            }, '', el_section);
+            applyToAllElements('#client-logged-in', function (el) {
+                el.setVisibility(0);
+            }, '', el_section);
+            getElementById('topbar-msg').setVisibility(0);
+            getElementById('menu-top').classList.remove('smaller-font', 'top-nav-menu');
+
             applyToAllElements('.client_logged_out', function (el) {
                 el.setVisibility(1);
             }, '', el_section);
@@ -10317,7 +10333,8 @@ var Header = function () {
         metatraderMenuItemVisibility: metatraderMenuItemVisibility,
         displayNotification: displayNotification,
         hideNotification: hideNotification,
-        displayAccountStatus: displayAccountStatus
+        displayAccountStatus: displayAccountStatus,
+        loginOnClick: loginOnClick
     };
 }();
 
@@ -11501,11 +11518,21 @@ module.exports = generateBirthDate;
 "use strict";
 
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 var DatePicker = __webpack_require__(/*! ../../components/date_picker */ "./src/javascript/app/components/date_picker.js");
 var dateValueChanged = __webpack_require__(/*! ../../../_common/common_functions */ "./src/javascript/_common/common_functions.js").dateValueChanged;
 var localize = __webpack_require__(/*! ../../../_common/localize */ "./src/javascript/_common/localize.js").localize;
 var toISOFormat = __webpack_require__(/*! ../../../_common/string_util */ "./src/javascript/_common/string_util.js").toISOFormat;
+
+var getDatePickerValue = function getDatePickerValue(selector, is_end_of_day) {
+    var val = $(selector).attr('data-value');
+    var getEpochTime = function getEpochTime() {
+        return is_end_of_day ? moment.utc(val).endOf('day').unix() : moment.utc(val).unix();
+    };
+    return val ? getEpochTime() : 0;
+};
 
 var getDateToFrom = function getDateToFrom() {
     var date_to_val = $('#date_to').attr('data-value');
@@ -11541,9 +11568,43 @@ var attachDateToPicker = function attachDateToPicker(fncOnChange) {
     if ($date_to.attr('data-picker') !== 'native') $date_to.val(localize('Today'));
 };
 
+var attachDateRangePicker = function attachDateRangePicker(date_from_id, date_to_id, fncOnChange) {
+    var onChange = function onChange(e) {
+        if (!dateValueChanged(e, 'date')) {
+            return false;
+        }
+        if (typeof fncOnChange === 'function') {
+            fncOnChange();
+        }
+        return true;
+    };
+
+    var initDatePicker = function initDatePicker(id, opts) {
+        var $datepicker = $(id);
+        DatePicker.init(_extends({
+            selector: id,
+            maxDate: 0
+        }, opts));
+        if ($datepicker.attr('data-picker') !== 'native') $datepicker.attr('placeholder', localize('Select date'));
+        $datepicker.change(function (e) {
+            onChange(e.currentTarget);
+            if (!$datepicker.is($(date_to_id))) {
+                // reset date_to datepicker with new min_date
+                $(date_to_id).val('').removeAttr('data-value');
+                initDatePicker(date_to_id, { minDate: new Date(e.target.value) });
+            }
+        });
+    };
+
+    initDatePicker(date_from_id);
+    initDatePicker(date_to_id);
+};
+
 module.exports = {
-    getDateToFrom: getDateToFrom,
-    attachDateToPicker: attachDateToPicker
+    attachDateToPicker: attachDateToPicker,
+    attachDateRangePicker: attachDateRangePicker,
+    getDatePickerValue: getDatePickerValue,
+    getDateToFrom: getDateToFrom
 };
 
 /***/ }),
@@ -17676,8 +17737,12 @@ var TradingAnalysis = function () {
     var showExplanation = function showExplanation() {
         var $container = $('#tab_explanation-content');
 
-        $container.find('#explanation_winning > div, #explanation_explain > div, #explanation_image').setVisibility(0);
-        $container.find('#explanation_winning, #winning_' + form_name + ', #explanation_explain, #explain_' + form_name).setVisibility(1);
+        $container.find('#explanation_winning > div, #explanation_explain > div, #explanation_image, #explanation_note, #explanation_note > div, #explanation_duration > div').setVisibility(0);
+        $container.find('#explanation_winning, #winning_' + form_name + ', #explanation_explain, #explain_' + form_name + ', #duration_' + Defaults.get('market')).setVisibility(1);
+
+        if ($container.find('#note_' + form_name).length) {
+            $('#explanation_note, #note_' + form_name).setVisibility(1);
+        }
 
         var images = {
             risefall: {
@@ -23703,6 +23768,7 @@ var Tick = __webpack_require__(/*! ./tick */ "./src/javascript/app/pages/trade/t
 var TickDisplay = __webpack_require__(/*! ./tick_trade */ "./src/javascript/app/pages/trade/tick_trade.js");
 var updateValues = __webpack_require__(/*! ./update_values */ "./src/javascript/app/pages/trade/update_values.js");
 var Client = __webpack_require__(/*! ../../base/client */ "./src/javascript/app/base/client.js");
+var Header = __webpack_require__(/*! ../../base/header */ "./src/javascript/app/base/header.js");
 var BinarySocket = __webpack_require__(/*! ../../base/socket */ "./src/javascript/app/base/socket.js");
 var formatMoney = __webpack_require__(/*! ../../common/currency */ "./src/javascript/app/common/currency.js").formatMoney;
 var CommonFunctions = __webpack_require__(/*! ../../../_common/common_functions */ "./src/javascript/_common/common_functions.js");
@@ -23746,6 +23812,7 @@ var Purchase = function () {
         var profit = CommonFunctions.getElementById('contract_purchase_profit');
         var spots = CommonFunctions.getElementById('contract_purchase_spots');
         var confirmation_error = CommonFunctions.getElementById('confirmation_error');
+        var authorization_error = CommonFunctions.getElementById('authorization_error_container');
         var contracts_list = CommonFunctions.getElementById('contracts_list');
         var button = CommonFunctions.getElementById('contract_purchase_button');
 
@@ -23758,23 +23825,31 @@ var Purchase = function () {
         if (error) {
             container.style.display = 'block';
             message_container.hide();
-            confirmation_error.show();
-            var message = error.message;
-            if (/RestrictedCountry/.test(error.code)) {
-                var additional_message = '';
-                if (/FinancialBinaries/.test(error.code)) {
-                    additional_message = localize('Try our [_1]Volatility Indices[_2].', ['<a href="' + urlFor('get-started/binary-options', 'anchor=volatility-indices#range-of-markets') + '" >', '</a>']);
-                } else if (/Random/.test(error.code)) {
-                    additional_message = localize('Try our other markets.');
+            if (/AuthorizationRequired/.test(error.code)) {
+                authorization_error.setVisibility(1);
+                var authorization_error_btn_login = CommonFunctions.getElementById('authorization_error_btn_login');
+                authorization_error_btn_login.removeEventListener('click', loginOnClick);
+                authorization_error_btn_login.addEventListener('click', loginOnClick);
+            } else {
+                confirmation_error.setVisibility(1);
+                var message = error.message;
+                if (/RestrictedCountry/.test(error.code)) {
+                    var additional_message = '';
+                    if (/FinancialBinaries/.test(error.code)) {
+                        additional_message = localize('Try our [_1]Volatility Indices[_2].', ['<a href="' + urlFor('get-started/binary-options', 'anchor=volatility-indices#range-of-markets') + '" >', '</a>']);
+                    } else if (/Random/.test(error.code)) {
+                        additional_message = localize('Try our other markets.');
+                    }
+                    message = error.message + '. ' + additional_message;
                 }
-                message = error.message + '. ' + additional_message;
+                CommonFunctions.elementInnerHtml(confirmation_error, message);
             }
-            CommonFunctions.elementInnerHtml(confirmation_error, message);
         } else {
             CommonFunctions.getElementById('guideBtn').style.display = 'none';
             container.style.display = 'table-row';
             message_container.show();
-            confirmation_error.hide();
+            authorization_error.setVisibility(0);
+            confirmation_error.setVisibility(0);
 
             CommonFunctions.elementTextContent(heading, localize('Contract Confirmation'));
             CommonFunctions.elementTextContent(descr, receipt.longcode);
@@ -23910,6 +23985,10 @@ var Purchase = function () {
 
     var makeBold = function makeBold(d) {
         return '<strong>' + d + '</strong>';
+    };
+
+    var loginOnClick = function loginOnClick(e) {
+        return Header.loginOnClick(e);
     };
 
     var updateSpotList = function updateSpotList() {
@@ -28793,6 +28872,7 @@ var Client = __webpack_require__(/*! ../../../../base/client */ "./src/javascrip
 var showLocalTimeOnHover = __webpack_require__(/*! ../../../../base/clock */ "./src/javascript/app/base/clock.js").showLocalTimeOnHover;
 var BinarySocket = __webpack_require__(/*! ../../../../base/socket */ "./src/javascript/app/base/socket.js");
 var DateTo = __webpack_require__(/*! ../../../../common/attach_dom/date_to */ "./src/javascript/app/common/attach_dom/date_to.js");
+var isEuCountry = __webpack_require__(/*! ../../../../common/country_base */ "./src/javascript/app/common/country_base.js").isEuCountry;
 var addTooltip = __webpack_require__(/*! ../../../../common/get_app_details */ "./src/javascript/app/common/get_app_details.js").addTooltip;
 var buildOauthApps = __webpack_require__(/*! ../../../../common/get_app_details */ "./src/javascript/app/common/get_app_details.js").buildOauthApps;
 var localize = __webpack_require__(/*! ../../../../../_common/localize */ "./src/javascript/_common/localize.js").localize;
@@ -28939,6 +29019,12 @@ var StatementInit = function () {
         getNextBatchStatement();
         loadStatementChunkWhenScroll();
         getAccountStatistics();
+
+        BinarySocket.wait('website_status', 'authorize', 'landing_company').then(function () {
+            if (isEuCountry() && !Client.get('is_virtual')) {
+                initDownloadStatement();
+            }
+        });
     };
 
     var onLoad = function onLoad() {
@@ -28949,6 +29035,73 @@ var StatementInit = function () {
             initPage();
         });
         ViewPopup.viewButtonOnClick('#statement-container');
+    };
+
+    var initDownloadStatement = function initDownloadStatement() {
+        var $statement_container = $('#statement-container');
+        var $ds_container = $('#download-statement-container');
+        var $download_statement_btn = $('#download_statement_btn');
+        var $request_statement_btn = $('#request_statement_btn');
+        var $success_msg = $ds_container.find('.success-msg');
+        var $error_msg = $ds_container.find('.error-msg');
+
+        var download_from_id = '#download_from';
+        var download_to_id = '#download_to';
+
+        $download_statement_btn.setVisibility(1);
+        $download_statement_btn.off('click').on('click', function (e) {
+            e.preventDefault();
+
+            $statement_container.setVisibility(0);
+            $ds_container.setVisibility(1);
+
+            DateTo.attachDateRangePicker(download_from_id, download_to_id, function () {
+                $success_msg.setVisibility(0);
+                $error_msg.setVisibility(0);
+
+                setTimeout(function () {
+                    // need to wrap with setTimeout 0 to execute this chunk of code right
+                    // after datepicker value are updated with newly selected date,
+                    // otherwise we will get the previously selected date
+                    // More info: https://javascript.info/settimeout-setinterval#settimeout-0
+                    var date_from = DateTo.getDatePickerValue(download_from_id);
+                    var date_to = DateTo.getDatePickerValue(download_to_id, true);
+                    var can_submit = date_from && date_to;
+
+                    if (can_submit) {
+                        $request_statement_btn.removeClass('button-disabled').off('click').on('click', function (evt) {
+                            evt.preventDefault();
+                            BinarySocket.send({
+                                request_report: 1,
+                                report_type: 'statement',
+                                date_from: date_from,
+                                date_to: date_to
+                            }).then(function (response) {
+                                if (response.error) {
+                                    $error_msg.text(response.error.message).setVisibility(1);
+                                } else {
+                                    $success_msg.setVisibility(1);
+                                }
+                                $request_statement_btn.addClass('button-disabled').off('click');
+                            });
+                        });
+                    } else {
+                        $request_statement_btn.addClass('button-disabled').off('click');
+                    }
+                }, 0);
+            });
+        });
+
+        $('#go_back_btn').off('click').on('click', function (e) {
+            e.preventDefault();
+            $ds_container.setVisibility(0);
+            $statement_container.setVisibility(1);
+            $success_msg.setVisibility(0);
+            $error_msg.setVisibility(0);
+            $request_statement_btn.addClass('button-disabled').off('click');
+            $(download_from_id).val('').removeAttr('data-value');
+            $(download_to_id).val('').removeAttr('data-value');
+        });
     };
 
     return {
