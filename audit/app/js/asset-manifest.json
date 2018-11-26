@@ -1,4 +1,9 @@
 {
   "binary.min.js": "/audit/app/js/binary.min.js",
-  "binary.min.js.map": "/audit/app/js/binary.min.js.map"
+  "binary.min.js.map": "/audit/app/js/binary.min.js.map",
+  "binary_common.js": "/audit/app/js/binary_common.js",
+  "binary_common.js.map": "/audit/app/js/binary_common.js.map",
+  "react_mobx.js": "/audit/app/js/react_mobx.js",
+  "smartcharts.js": "/audit/app/js/smartcharts.js",
+  "vendor.js": "/audit/app/js/vendor.js"
 }
