@@ -1,7 +1,6 @@
 {
   "0.min.js": "/audit/app/js/0.min.js",
   "1.min.js": "/audit/app/js/1.min.js",
-  "2.min.js": "/audit/app/js/2.min.js",
   "binary.min.js": "/audit/app/js/binary.min.js",
   "binary.min.js.map": "/audit/app/js/binary.min.js.map",
   "binary_common.js": "/audit/app/js/binary_common.min.js",
