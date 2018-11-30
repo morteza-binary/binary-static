@@ -8701,7 +8701,7 @@ var Header = function Header(_ref) {
                 _react2.default.createElement(
                     'div',
                     { className: 'acc-balance-container' },
-                    is_install_button_visible && _react2.default.createElement(_Header.InstallPWAButton, {
+                    is_install_button_visible && is_logged_in && _react2.default.createElement(_Header.InstallPWAButton, {
                         prompt_event: pwa_prompt_event,
                         onClick: hideInstallButton
                     }),
@@ -24952,7 +24952,7 @@ var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _m
         key: 'showInstallButton',
         value: function showInstallButton() {
             // TODO The value should be change to `True` whenever the design of showing installation prompt gets ready.
-            this.is_install_button_visible = true;
+            this.is_install_button_visible = false;
         }
     }, {
         key: 'hideInstallButton',
