@@ -7648,7 +7648,7 @@ var InstallPWAButton = function InstallPWAButton(_ref) {
     };
 
     return _react2.default.createElement(_button2.default, {
-        className: 'primary orang',
+        className: 'primary orange',
         has_effect: true,
         text: (0, _localize.localize)('Install'),
         onClick: showPrompt
@@ -24952,7 +24952,7 @@ var UIStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _m
         key: 'showInstallButton',
         value: function showInstallButton() {
             // TODO The value should be change to `True` whenever the design of showing installation prompt gets ready.
-            this.is_install_button_visible = false;
+            this.is_install_button_visible = true;
         }
     }, {
         key: 'hideInstallButton',
