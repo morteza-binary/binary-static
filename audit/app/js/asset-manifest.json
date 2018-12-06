@@ -13,7 +13,6 @@
   "login_history.js": "/audit/app/js/login_history.min.js",
   "personal_details.js": "/audit/app/js/personal_details.min.js",
   "portfolio.js": "/audit/app/js/portfolio.min.js",
-  "portfolio.empty_message.js": "/audit/app/js/portfolio.empty_message.min.js",
   "react_mobx.js": "/audit/app/js/react_mobx.min.js",
   "self_exclusion.js": "/audit/app/js/self_exclusion.min.js",
   "settings.js": "/audit/app/js/settings.min.js",
