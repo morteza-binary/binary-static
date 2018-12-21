@@ -63,7 +63,7 @@
 /******/
 /******/ 	// script path function
 /******/ 	function jsonpScriptSrc(chunkId) {
-/******/ 		return __webpack_require__.p + "" + ({"account_password":"account_password","api_toke":"api_toke","authorized_application":"authorized_application","cashier_password":"cashier_password","contract":"contract","financial_assessment":"financial_assessment","limits":"limits","login_history":"login_history","personal_details":"personal_details","portfolio":"portfolio","self_exclusion":"self_exclusion","settings":"settings","statement":"statement","vendors~smart_chart":"vendors~smart_chart","smart_chart":"smart_chart"}[chunkId]||chunkId) + "-" + {"account_password":"67c66084bc424d34b10b","api_toke":"7c72ca04a060c6e8363d","authorized_application":"97635409ac3488b8a4dc","cashier_password":"0061f340e2203b85c4de","contract":"d5ff3abe544011cd2843","financial_assessment":"fa615b65ab7d51a072e8","limits":"6122a66075b7120f5152","login_history":"f73b0e94430bafb6dff4","personal_details":"8c2c516db1200e2e67f1","portfolio":"1584857c9715b9ff1453","self_exclusion":"10c70715aab8e89cdf0f","settings":"ca9468bf93e3269db11e","statement":"2879562294b7483a1594","vendors~smart_chart":"2c0607fba4d5b39501b4","smart_chart":"3bd5fe29258265801823"}[chunkId] + ".js"
+/******/ 		return __webpack_require__.p + "" + ({"404":"404","account_password":"account_password","api_toke":"api_toke","authorized_application":"authorized_application","cashier_password":"cashier_password","contract":"contract","financial_assessment":"financial_assessment","limits":"limits","login_history":"login_history","personal_details":"personal_details","portfolio":"portfolio","self_exclusion":"self_exclusion","settings":"settings","statement":"statement","vendors~smart_chart":"vendors~smart_chart","smart_chart":"smart_chart"}[chunkId]||chunkId) + "-" + {"404":"1f20d1cb6ffbf53419ed","account_password":"67c66084bc424d34b10b","api_toke":"7c72ca04a060c6e8363d","authorized_application":"97635409ac3488b8a4dc","cashier_password":"0061f340e2203b85c4de","contract":"d5ff3abe544011cd2843","financial_assessment":"fa615b65ab7d51a072e8","limits":"6122a66075b7120f5152","login_history":"f73b0e94430bafb6dff4","personal_details":"8c2c516db1200e2e67f1","portfolio":"1584857c9715b9ff1453","self_exclusion":"10c70715aab8e89cdf0f","settings":"ca9468bf93e3269db11e","statement":"0024c341cb419b599fb3","vendors~smart_chart":"2c0607fba4d5b39501b4","smart_chart":"3bd5fe29258265801823"}[chunkId] + ".js"
 /******/ 	}
 /******/
 /******/ 	// The require function
@@ -7317,6 +7317,8 @@ var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactRouterDom = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/es/index.js");
+
 var _ui_loader = __webpack_require__(/*! ../Elements/ui_loader.jsx */ "./src/javascript/app_2/App/Components/Elements/ui_loader.jsx");
 
 var _ui_loader2 = _interopRequireDefault(_ui_loader);
@@ -7335,13 +7337,71 @@ var BinaryRoutes = function BinaryRoutes() {
     return _react2.default.createElement(
         _react2.default.Suspense,
         { fallback: _react2.default.createElement(_ui_loader2.default, null) },
-        (0, _routes_config2.default)().map(function (route, idx) {
-            return _react2.default.createElement(_route_with_sub_routes2.default, _extends({ key: idx }, route));
-        })
+        _react2.default.createElement(
+            _reactRouterDom.Switch,
+            null,
+            (0, _routes_config2.default)().map(function (route, idx) {
+                return _react2.default.createElement(_route_with_sub_routes2.default, _extends({ key: idx }, route));
+            })
+        )
     );
 };
 
 exports.default = BinaryRoutes;
+
+/***/ }),
+
+/***/ "./src/javascript/app_2/App/Components/Routes/button_link.jsx":
+/*!********************************************************************!*\
+  !*** ./src/javascript/app_2/App/Components/Routes/button_link.jsx ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _classnames = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _propTypes = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterDom = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/es/index.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ButtonLink = function ButtonLink(_ref) {
+    var children = _ref.children,
+        className = _ref.className,
+        to = _ref.to;
+    return _react2.default.createElement(
+        _reactRouterDom.Link,
+        {
+            className: (0, _classnames2.default)('btn is-link', className, 'effect'),
+            to: to
+        },
+        children
+    );
+};
+
+ButtonLink.propTypes = {
+    children: _propTypes2.default.object,
+    className: _propTypes2.default.string,
+    to: _propTypes2.default.string
+};
+
+exports.default = ButtonLink;
 
 /***/ }),
 
@@ -7420,7 +7480,7 @@ var getContractPath = exports.getContractPath = function getContractPath(contrac
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.RouteWithSubRoutes = exports.default = exports.BinaryLink = undefined;
+exports.RouteWithSubRoutes = exports.default = exports.ButtonLink = exports.BinaryLink = undefined;
 
 var _helpers = __webpack_require__(/*! ./helpers */ "./src/javascript/app_2/App/Components/Routes/helpers.js");
 
@@ -7438,6 +7498,10 @@ var _binary_link = __webpack_require__(/*! ./binary_link.jsx */ "./src/javascrip
 
 var _binary_link2 = _interopRequireDefault(_binary_link);
 
+var _button_link = __webpack_require__(/*! ./button_link.jsx */ "./src/javascript/app_2/App/Components/Routes/button_link.jsx");
+
+var _button_link2 = _interopRequireDefault(_button_link);
+
 var _binary_routes = __webpack_require__(/*! ./binary_routes.jsx */ "./src/javascript/app_2/App/Components/Routes/binary_routes.jsx");
 
 var _binary_routes2 = _interopRequireDefault(_binary_routes);
@@ -7449,6 +7513,7 @@ var _route_with_sub_routes2 = _interopRequireDefault(_route_with_sub_routes);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.BinaryLink = _binary_link2.default;
+exports.ButtonLink = _button_link2.default;
 exports.default = _binary_routes2.default;
 exports.RouteWithSubRoutes = _route_with_sub_routes2.default;
 
@@ -7668,20 +7733,30 @@ var SelfExclusion = (0, _react.lazy)(function () {
     return __webpack_require__.e(/*! import() | self_exclusion */ "self_exclusion").then(__webpack_require__.t.bind(null, /*! ../../Modules/settings/sections/self_exclusion.jsx */ "./src/javascript/app_2/Modules/settings/sections/self_exclusion.jsx", 7));
 });
 
+// Error Routes
+var Page404 = (0, _react.lazy)(function () {
+    return __webpack_require__.e(/*! import() | 404 */ "404").then(__webpack_require__.t.bind(null, /*! ../../Modules/Page404 */ "./src/javascript/app_2/Modules/Page404/index.js", 7));
+});
+
 var initRoutesConfig = function initRoutesConfig() {
     return [{ path: _Constants.routes.contract, component: ContractDetails, title: (0, _localize.localize)('Contract Details'), is_authenticated: true }, { path: _Constants.routes.index, component: _reactRouterDom.Redirect, title: '', to: '/trade' }, { path: _Constants.routes.portfolio, component: Portfolio, title: (0, _localize.localize)('Portfolio'), is_authenticated: true, icon_component: _NavBar.IconPortfolio }, { path: _Constants.routes.root, component: _reactRouterDom.Redirect, title: '', exact: true, to: '/trade' }, { path: _Constants.routes.statement, component: Statement, title: (0, _localize.localize)('Statement'), is_authenticated: true, icon_component: _NavBar.IconStatement }, { path: _Constants.routes.trade, component: _Trading2.default, title: (0, _localize.localize)('Trade'), exact: true }, {
         path: _Constants.routes.settings,
         component: Settings,
         is_authenticated: true,
         routes: [{ path: _Constants.routes.personal, component: PersonalDetails, title: (0, _localize.localize)('Personal Details') }, { path: _Constants.routes.financial, component: FinancialAssessment, title: (0, _localize.localize)('Financial Assessment') }, { path: _Constants.routes.account_password, component: AccountPassword, title: (0, _localize.localize)('Account Password') }, { path: _Constants.routes.cashier_password, component: CashierPassword, title: (0, _localize.localize)('Cashier Password') }, { path: _Constants.routes.exclusion, component: SelfExclusion, title: (0, _localize.localize)('Self Exclusion') }, { path: _Constants.routes.limits, component: Limits, title: (0, _localize.localize)('Account Limits') }, { path: _Constants.routes.history, component: LoginHistory, title: (0, _localize.localize)('Login History') }, { path: _Constants.routes.token, component: ApiToken, title: (0, _localize.localize)('API Token') }, { path: _Constants.routes.apps, component: AuthorizedApplications, title: (0, _localize.localize)('Authorized Applications') }]
-    }];
+    }, { path: _Constants.routes.error404, component: Page404, title: (0, _localize.localize)('Error 404') }];
 };
 
 var routes_config = void 0;
+
+// For default page route if page/path is not found, must be kept at the end of routes_config array
+var route_default = { component: Page404, title: (0, _localize.localize)('Error 404') };
+
 var getRoutesConfig = function getRoutesConfig() {
     if (!routes_config) {
         routes_config = initRoutesConfig();
     }
+    routes_config.push(route_default);
     return routes_config;
 };
 
@@ -10883,6 +10958,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 var routes = {
+    error404: '/404',
     account_password: '/settings/account_password',
     apps: '/settings/apps',
     cashier_password: '/settings/cashier_password',
