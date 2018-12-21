@@ -98,8 +98,8 @@
         };
     }
 
-    function getQueryString(field) {
-        const pattern = `${field}=(.*)&`;
+    function getQueryString(field, value) {
+        const pattern = `${field}=${value ? value : '(.*)'}(&)?$`;
         const result = new RegExp(pattern,'g').exec(location.search)
         if (result && result.length) {
             return result[1];
