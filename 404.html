@@ -109,7 +109,7 @@
     }
 
     var all_lang_regex = new RegExp('(' + all_languages.join('|') + ')', 'i');
-    var is_from_404 = getQueryString('from_404', 'true|false') === 'true' ? true : false;
+    var is_from_404 = !!getQueryString('from_404', 'true|false');
     var redirectFn = routeHandler.isApp2() && !is_from_404 ? routeHandler.redirectToReactRoute : routeHandler.redirect;
 
     var lang = location.href
