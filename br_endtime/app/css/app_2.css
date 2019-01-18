@@ -2318,7 +2318,7 @@ div.datepicker-container {
   position: relative; }
   .time-picker.padding {
     padding: 16px; }
-  .time-picker #time-picker-input.time-picker-input {
+  .time-picker .time-picker-input {
     height: 32px;
     padding: 0 8px;
     border-radius: 4px;
@@ -2328,15 +2328,15 @@ div.datepicker-container {
     font-weight: 300;
     margin: 0;
     cursor: pointer; }
-    .time-picker #time-picker-input.time-picker-input::-webkit-input-placeholder {
+    .time-picker .time-picker-input::-webkit-input-placeholder {
       color: #e9e9ed; }
-    .time-picker #time-picker-input.time-picker-input::-ms-input-placeholder {
+    .time-picker .time-picker-input::-ms-input-placeholder {
       color: #e9e9ed; }
-    .time-picker #time-picker-input.time-picker-input::placeholder {
+    .time-picker .time-picker-input::placeholder {
       color: #e9e9ed; }
-    .time-picker #time-picker-input.time-picker-input:hover {
+    .time-picker .time-picker-input:hover {
       border-color: #e9e9ed; }
-    .time-picker #time-picker-input.time-picker-input.active {
+    .time-picker .time-picker-input.active {
       border-color: #2a3052; }
   .time-picker .time-picker-dropdown {
     font-size: 16px;
