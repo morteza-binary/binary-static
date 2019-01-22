@@ -5369,227 +5369,6 @@ exports.default = _dropdown2.default;
 
 /***/ }),
 
-/***/ "./src/javascript/app_2/App/Components/Form/RangeSlider/index.js":
-/*!***********************************************************************!*\
-  !*** ./src/javascript/app_2/App/Components/Form/RangeSlider/index.js ***!
-  \***********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = undefined;
-
-var _range_slider = __webpack_require__(/*! ./range_slider.jsx */ "./src/javascript/app_2/App/Components/Form/RangeSlider/range_slider.jsx");
-
-var _range_slider2 = _interopRequireDefault(_range_slider);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _range_slider2.default;
-
-/***/ }),
-
-/***/ "./src/javascript/app_2/App/Components/Form/RangeSlider/range_slider.jsx":
-/*!*******************************************************************************!*\
-  !*** ./src/javascript/app_2/App/Components/Form/RangeSlider/range_slider.jsx ***!
-  \*******************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _classnames = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _mobxReact = __webpack_require__(/*! mobx-react */ "./node_modules/mobx-react/index.module.js");
-
-var _propTypes = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-
-var _react2 = _interopRequireDefault(_react);
-
-var _localize = __webpack_require__(/*! ../../../../../_common/localize */ "./src/javascript/_common/localize.js");
-
-var _tick_steps = __webpack_require__(/*! ./tick_steps.jsx */ "./src/javascript/app_2/App/Components/Form/RangeSlider/tick_steps.jsx");
-
-var _tick_steps2 = _interopRequireDefault(_tick_steps);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var RangeSlider = function RangeSlider(_ref) {
-    var className = _ref.className,
-        ticks = _ref.ticks,
-        max_value = _ref.max_value,
-        min_value = _ref.min_value,
-        name = _ref.name,
-        value = _ref.value,
-        onChange = _ref.onChange;
-
-
-    var handleChange = function handleChange(e) {
-        if (e.target.value !== value) {
-            onChange({ target: { name: name, value: e.target.value } });
-        }
-    };
-
-    var handleClick = function handleClick(e, index) {
-        if (index !== value) {
-            onChange({ target: { name: name, value: index } });
-        }
-    };
-
-    var first_tick = ticks - (ticks - 1);
-
-    var is_error = value < min_value || value > max_value ? 'error' : '';
-
-    return _react2.default.createElement(
-        'div',
-        { className: (0, _classnames2.default)('range-slider', className, { 'error': is_error }) },
-        _react2.default.createElement(
-            'label',
-            { htmlFor: 'range' },
-            _react2.default.createElement('input', {
-                id: 'range',
-                className: 'range-slider__track',
-                type: 'range',
-                min: first_tick,
-                max: ticks,
-                min_value: min_value,
-                max_value: max_value,
-                name: name,
-                steps: '1',
-                onChange: handleChange,
-                tabIndex: '0',
-                value: value
-            }),
-            _react2.default.createElement(
-                'div',
-                { className: 'ticks' },
-                _react2.default.createElement(_tick_steps2.default, {
-                    value: value,
-                    ticks: ticks,
-                    onClick: handleClick
-                })
-            ),
-            _react2.default.createElement('div', {
-                className: 'range-slider__line',
-                style: { width: 'calc(' + value * 10 + '% - ' + (value < 4 ? '0.8rem' : '0.5rem') + ')' }
-            })
-        ),
-        _react2.default.createElement(
-            'div',
-            { className: 'range-slider__caption' },
-            _react2.default.createElement(
-                'span',
-                null,
-                first_tick
-            ),
-            !!value && _react2.default.createElement(
-                'span',
-                null,
-                (0, _localize.localize)('[_1] Ticks', value || '')
-            ),
-            _react2.default.createElement(
-                'span',
-                null,
-                ticks
-            )
-        )
-    );
-};
-
-RangeSlider.propTypes = {
-    className: _propTypes2.default.string,
-    first_tick: _propTypes2.default.number,
-    max_value: _propTypes2.default.oneOfType([_propTypes2.default.number, _propTypes2.default.string]),
-    min_value: _propTypes2.default.oneOfType([_propTypes2.default.number, _propTypes2.default.string]),
-    name: _propTypes2.default.string,
-    onChange: _propTypes2.default.func,
-    value: _propTypes2.default.oneOfType([_propTypes2.default.number, _propTypes2.default.string])
-};
-
-exports.default = (0, _mobxReact.observer)(RangeSlider);
-
-/***/ }),
-
-/***/ "./src/javascript/app_2/App/Components/Form/RangeSlider/tick_steps.jsx":
-/*!*****************************************************************************!*\
-  !*** ./src/javascript/app_2/App/Components/Form/RangeSlider/tick_steps.jsx ***!
-  \*****************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _classnames = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _propTypes = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var TickSteps = function TickSteps(_ref) {
-    var value = _ref.value,
-        ticks = _ref.ticks,
-        _onClick = _ref.onClick;
-
-    var arr_ticks = [].concat(_toConsumableArray(Array(ticks).keys()));
-    return _react2.default.createElement(
-        _react2.default.Fragment,
-        null,
-        arr_ticks.map(function (idx) {
-            return _react2.default.createElement('span', {
-                key: idx,
-                className: (0, _classnames2.default)('ticks__step', {
-                    'ticks__step--active': idx + 1 === parseInt(value),
-                    'ticks__step--marked': idx + 1 < parseInt(value)
-                }),
-                onClick: function onClick(e) {
-                    return _onClick(e, idx + 1);
-                }
-            });
-        })
-    );
-};
-
-TickSteps.propTypes = {
-    onClick: _propTypes2.default.func,
-    ticks: _propTypes2.default.oneOfType([_propTypes2.default.number, _propTypes2.default.string]),
-    value: _propTypes2.default.oneOfType([_propTypes2.default.number, _propTypes2.default.string])
-};
-
-exports.default = TickSteps;
-
-/***/ }),
-
 /***/ "./src/javascript/app_2/App/Components/Form/button.jsx":
 /*!*************************************************************!*\
   !*** ./src/javascript/app_2/App/Components/Form/button.jsx ***!
@@ -5791,12 +5570,10 @@ var _tooltip2 = _interopRequireDefault(_tooltip);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var InputField = function InputField(_ref) {
-    var checked = _ref.checked,
-        className = _ref.className,
+    var className = _ref.className,
         error_messages = _ref.error_messages,
         fractional_digits = _ref.fractional_digits,
         helper = _ref.helper,
-        id = _ref.id,
         is_disabled = _ref.is_disabled,
         is_float = _ref.is_float,
         is_incrementable = _ref.is_incrementable,
@@ -5871,12 +5648,10 @@ var InputField = function InputField(_ref) {
     };
 
     var input = _react2.default.createElement('input', {
-        checked: checked ? 'checked' : '',
         className: (0, _classnames2.default)({ error: has_error }),
         disabled: is_disabled,
         'data-for': 'error_tooltip_' + name,
         'data-tip': true,
-        id: id,
         maxLength: fractional_digits ? max_length + fractional_digits + 1 : max_length,
         name: name,
         onKeyDown: is_incrementable ? onKeyPressed : undefined,
@@ -5946,12 +5721,10 @@ var InputField = function InputField(_ref) {
 // Quick Solution - Pass two different props to input field.
 // implicit import here { IconMinus, IconPlus } from 'Assets/Common' breaks compilation
 InputField.propTypes = {
-    checked: _propTypes2.default.number,
     className: _propTypes2.default.string,
     error_messages: _mobxReact.PropTypes.arrayOrObservableArray,
     fractional_digits: _propTypes2.default.number,
     helper: _propTypes2.default.string,
-    id: _propTypes2.default.string,
     is_disabled: _propTypes2.default.string,
     is_float: _propTypes2.default.bool,
     is_incrementable: _propTypes2.default.bool,
@@ -10703,28 +10476,6 @@ var IconTradeCategory = function IconTradeCategory(_ref) {
                     )
                 );
                 break;
-            case 'rise_fall_equal':
-                IconCategory = _react2.default.createElement(
-                    _react2.default.Fragment,
-                    null,
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'category-wrapper' },
-                        _react2.default.createElement(_Types.IconTradeType, {
-                            className: 'category-type',
-                            type: 'calle'
-                        })
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'category-wrapper' },
-                        _react2.default.createElement(_Types.IconTradeType, {
-                            className: 'category-type',
-                            type: 'pute'
-                        })
-                    )
-                );
-                break;
             case 'high_low':
                 IconCategory = _react2.default.createElement(
                     _react2.default.Fragment,
@@ -11051,7 +10802,6 @@ var IconTradeType = function IconTradeType(_ref) {
                     _react2.default.createElement('path', { className: 'important', fill: '#F93', d: 'M3.425 15.91H.045v-3.387h2.073v1.874l1.87-1.874h2.818z' })
                 );
                 break;
-            case 'calle':
             case 'call':
                 IconType = _react2.default.createElement(
                     'g',
@@ -11247,7 +10997,6 @@ var IconTradeType = function IconTradeType(_ref) {
                     _react2.default.createElement('path', { className: 'important', fill: '#F93', d: 'M3.515 2.113H.135V5.5h2.073V3.626L4.078 5.5h2.818z' })
                 );
                 break;
-            case 'pute':
             case 'put':
                 IconType = _react2.default.createElement(
                     'g',
@@ -13236,7 +12985,7 @@ var ContractTypeItem = function ContractTypeItem(_ref) {
         value = _ref.value,
         handleSelect = _ref.handleSelect;
     return contracts.map(function (contract, idx) {
-        return contract.value !== 'rise_fall_equal' && _react2.default.createElement(
+        return _react2.default.createElement(
             'div',
             {
                 key: idx,
@@ -14232,74 +13981,6 @@ exports.default = ContractInfo;
 
 /***/ }),
 
-/***/ "./src/javascript/app_2/Modules/Trading/Components/Form/TradeParams/allow_equals.jsx":
-/*!*******************************************************************************************!*\
-  !*** ./src/javascript/app_2/Modules/Trading/Components/Form/TradeParams/allow_equals.jsx ***!
-  \*******************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _localize = __webpack_require__(/*! ../../../../../../_common/localize */ "./src/javascript/_common/localize.js");
-
-var _tooltip = __webpack_require__(/*! ../../../../../App/Components/Elements/tooltip.jsx */ "./src/javascript/app_2/App/Components/Elements/tooltip.jsx");
-
-var _tooltip2 = _interopRequireDefault(_tooltip);
-
-var _input_field = __webpack_require__(/*! ../../../../../App/Components/Form/input_field.jsx */ "./src/javascript/app_2/App/Components/Form/input_field.jsx");
-
-var _input_field2 = _interopRequireDefault(_input_field);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var AllowEquals = function AllowEquals(_ref) {
-    var is_allow_equal = _ref.is_allow_equal,
-        checked = _ref.checked,
-        onChange = _ref.onChange;
-    return !!is_allow_equal && _react2.default.createElement(
-        'div',
-        { className: 'allow-equals' },
-        _react2.default.createElement(_input_field2.default, {
-            id: 'allow_equals',
-            name: 'contract_type',
-            onChange: onChange,
-            value: 'is_equal',
-            type: 'checkbox',
-            checked: checked
-        }),
-        _react2.default.createElement(
-            'label',
-            { htmlFor: 'allow_equals' },
-            (0, _localize.localize)('Allow equals')
-        ),
-        _react2.default.createElement(_tooltip2.default, { icon: 'info', message: (0, _localize.localize)('Win payout if exit spot is also equal to entry spot.'), alignment: 'left' })
-    );
-};
-
-AllowEquals.propTypes = {
-    checked: _propTypes2.default.number,
-    is_allow_equal: _propTypes2.default.bool,
-    onChange: _propTypes2.default.func
-};
-
-exports.default = AllowEquals;
-
-/***/ }),
-
 /***/ "./src/javascript/app_2/Modules/Trading/Components/Form/TradeParams/amount.jsx":
 /*!*************************************************************************************!*\
   !*** ./src/javascript/app_2/Modules/Trading/Components/Form/TradeParams/amount.jsx ***!
@@ -14344,10 +14025,6 @@ var _input_field = __webpack_require__(/*! ../../../../../App/Components/Form/in
 
 var _input_field2 = _interopRequireDefault(_input_field);
 
-var _allow_equals = __webpack_require__(/*! ./allow_equals.jsx */ "./src/javascript/app_2/Modules/Trading/Components/Form/TradeParams/allow_equals.jsx");
-
-var _allow_equals2 = _interopRequireDefault(_allow_equals);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Amount = function Amount(_ref) {
@@ -14356,8 +14033,6 @@ var Amount = function Amount(_ref) {
         basis_list = _ref.basis_list,
         currencies_list = _ref.currencies_list,
         currency = _ref.currency,
-        is_allow_equal = _ref.is_allow_equal,
-        is_equal_checked = _ref.is_equal_checked,
         is_minimized = _ref.is_minimized,
         is_nativepicker = _ref.is_nativepicker,
         is_single_currency = _ref.is_single_currency,
@@ -14424,8 +14099,7 @@ var Amount = function Amount(_ref) {
                 type: 'number',
                 value: amount
             })
-        ),
-        _react2.default.createElement(_allow_equals2.default, { is_allow_equal: is_allow_equal, onChange: onChange, checked: is_equal_checked })
+        )
     );
 };
 
@@ -14435,8 +14109,6 @@ Amount.propTypes = {
     basis_list: _mobxReact.PropTypes.arrayOrObservableArray,
     currencies_list: _mobxReact.PropTypes.observableObject,
     currency: _propTypes2.default.string,
-    is_allow_equal: _propTypes2.default.bool,
-    is_equal_checked: _propTypes2.default.number,
     is_minimized: _propTypes2.default.bool,
     is_nativepicker: _propTypes2.default.bool,
     is_single_currency: _propTypes2.default.bool,
@@ -14572,8 +14244,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _classnames = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
 
 var _classnames2 = _interopRequireDefault(_classnames);
@@ -14606,10 +14276,6 @@ var _input_field = __webpack_require__(/*! ../../../../../App/Components/Form/in
 
 var _input_field2 = _interopRequireDefault(_input_field);
 
-var _RangeSlider = __webpack_require__(/*! ../../../../../App/Components/Form/RangeSlider */ "./src/javascript/app_2/App/Components/Form/RangeSlider/index.js");
-
-var _RangeSlider2 = _interopRequireDefault(_RangeSlider);
-
 var _time_picker = __webpack_require__(/*! ../../../../../App/Components/Form/time_picker.jsx */ "./src/javascript/app_2/App/Components/Form/time_picker.jsx");
 
 var _time_picker2 = _interopRequireDefault(_time_picker);
@@ -14623,17 +14289,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* TODO:
       1. disable days other than today and tomorrow if start date is forward starting
 */
-
-var expiry_list = [{ text: (0, _localize.localize)('Duration'), value: 'duration' }];
-
-var now_date = void 0,
-    max_date_duration = void 0,
-    min_date_expiry = void 0,
-    min_day = void 0,
-    max_day = void 0,
-    start_date_time = void 0,
-    max_duration = void 0,
-    min_duration = void 0;
 
 var Duration = function Duration(_ref) {
     var contract_expiry_type = _ref.contract_expiry_type,
@@ -14651,44 +14306,45 @@ var Duration = function Duration(_ref) {
         sessions = _ref.sessions,
         start_date = _ref.start_date,
         start_time = _ref.start_time,
+        market_close_times = _ref.market_close_times,
         validation_errors = _ref.validation_errors;
 
-    if (duration_min_max[contract_expiry_type]) {
+    var expiry_list = [{ text: (0, _localize.localize)('Duration'), value: 'duration' }];
+
+    var moment_expiry = (0, _Date.toMoment)(expiry_date || server_time);
+    var is_24_hours_contract = false;
+    var expiry_time_sessions = sessions;
+    var max_date_duration = void 0,
+        min_date_expiry = void 0,
+        max_duration = void 0,
+        min_duration = void 0;
+
+    if (expiry_type !== 'endtime' && duration_min_max[contract_expiry_type]) {
         min_duration = (0, _duration.convertDurationLimit)(+duration_min_max[contract_expiry_type].min, duration_unit);
         max_duration = (0, _duration.convertDurationLimit)(+duration_min_max[contract_expiry_type].max, duration_unit);
-        var moment_now = (0, _Date.toMoment)(server_time);
-        var new_min_day = (0, _duration.convertDurationUnit)(duration_min_max[contract_expiry_type].min, 's', 'd');
-        var new_max_day = (0, _duration.convertDurationUnit)(duration_min_max[contract_expiry_type].max, 's', 'd');
-        if (!now_date || moment_now.date() !== now_date.date() || duration_unit === 'd' && (min_day !== new_min_day || max_day !== new_max_day)) {
-            if (duration_unit === 'd') {
-                min_day = new_min_day;
-                max_day = new_max_day;
-            }
+    } else if (expiry_type === 'endtime') {
+        var max_daily_duration = duration_min_max.daily ? duration_min_max.daily.max : 365 * 24 * 3600;
+        var moment_contract_start_date_time = (0, _Date.setTime)((0, _Date.toMoment)(start_date || server_time), (0, _Date.isTimeValid)(start_time) ? start_time : server_time.format('HH:mm'));
 
-            var moment_today = moment_now.clone().startOf('day');
+        // When the contract start is forwarding or is not forwarding but the expiry date is as same as start date, the contract should be expired within 24 hours
+        is_24_hours_contract = !!start_date || moment_expiry.isSame((0, _Date.toMoment)(server_time), 'day');
 
-            now_date = moment_now.clone();
-            max_date_duration = moment_today.clone().add(max_day || 365, 'd');
-            min_date_expiry = moment_today.clone();
-        }
-    }
+        if (is_24_hours_contract) {
+            var expiry_date_time = (0, _Date.setTime)(moment_expiry.clone(), moment_contract_start_date_time.clone().add(5, 'minute').format('HH:mm'));
+            var expiry_date_market_close = (0, _Date.setTime)(expiry_date_time.clone(), market_close_times.slice(-1)[0]);
+            var is_expired_next_day = expiry_date_time.diff(moment_contract_start_date_time, 'day') === 1;
 
-    var moment_expiry = (0, _Date.toMoment)(expiry_date);
-    var is_same_day = moment_expiry.isSame((0, _Date.toMoment)(start_date), 'day');
-    if (is_same_day) {
-        var date_time = (0, _Date.toMoment)(start_date);
-        if (start_date && (0, _Date.isTimeValid)(start_time)) {
-            var _start_time$split = start_time.split(':'),
-                _start_time$split2 = _slicedToArray(_start_time$split, 2),
-                hour = _start_time$split2[0],
-                minute = _start_time$split2[1];
+            expiry_time_sessions = [{
+                open: is_expired_next_day ? expiry_date_time.clone().startOf('day') : expiry_date_time.clone(),
+                // when the expiry_date is on the next day of the start_date, the session should be close 5 min before the start_time of the contract.
+                close: is_expired_next_day ? (0, _Date.minDate)(expiry_date_time.clone().subtract(10, 'minute'), expiry_date_market_close) : expiry_date_market_close.clone()
+            }];
 
-            date_time.hour(hour).minute(minute).second(0).add(5, 'minutes');
-        }
-        // only update start time every five minutes, since time picker shows five minute durations
-        var moment_start_date_time = (0, _Date.toMoment)(start_date_time);
-        if (!start_date_time || moment_start_date_time.isAfter(date_time) || moment_start_date_time.clone().add(5, 'minutes').isBefore(date_time) || moment_start_date_time.minutes() !== date_time.minutes() && date_time.minutes() % 5 === 0) {
-            start_date_time = date_time.unix();
+            min_date_expiry = moment_contract_start_date_time.clone().startOf('day');
+            max_date_duration = moment_contract_start_date_time.clone().add(start_date ? 24 * 3600 : max_daily_duration, 'second');
+        } else {
+            min_date_expiry = moment_contract_start_date_time.clone().startOf('day');
+            max_date_duration = moment_contract_start_date_time.clone().add(max_daily_duration, 'second');
         }
     }
     if (is_minimized) {
@@ -14715,7 +14371,7 @@ var Duration = function Duration(_ref) {
     }
 
     var endtime_container_class = (0, _classnames2.default)('endtime-container', {
-        'has-time': is_same_day
+        'has-time': is_24_hours_contract
     });
 
     return _react2.default.createElement(
@@ -14744,14 +14400,7 @@ var Duration = function Duration(_ref) {
                     onChange: onChange,
                     is_nativepicker: is_nativepicker
                 }),
-                duration_unit === 't' ? _react2.default.createElement(_RangeSlider2.default, {
-                    max_value: max_duration,
-                    min_value: min_duration,
-                    name: 'duration',
-                    ticks: 10,
-                    value: duration,
-                    onChange: onChange
-                }) : _react2.default.createElement(_input_field2.default, {
+                _react2.default.createElement(_input_field2.default, {
                     type: 'number',
                     max_value: max_duration,
                     min_value: min_duration,
@@ -14781,14 +14430,14 @@ var Duration = function Duration(_ref) {
                     is_clearable: false,
                     is_nativepicker: is_nativepicker
                 }),
-                is_same_day && _react2.default.createElement(_time_picker2.default, {
+                is_24_hours_contract && _react2.default.createElement(_time_picker2.default, {
                     onChange: onChange,
                     is_align_right: true,
                     name: 'expiry_time',
-                    value: expiry_time,
                     placeholder: '12:00',
-                    start_date: start_date_time,
-                    sessions: sessions,
+                    sessions: expiry_time_sessions,
+                    start_date: moment_expiry.unix(),
+                    value: expiry_time || min_date_expiry.format('HH:mm'),
                     is_clearable: false,
                     is_nativepicker: is_nativepicker
                     // validation_errors={validation_errors.end_time} TODO: add validation_errors for end time
@@ -14810,6 +14459,7 @@ Duration.propTypes = {
     expiry_type: _propTypes2.default.string,
     is_minimized: _propTypes2.default.bool,
     is_nativepicker: _propTypes2.default.bool,
+    market_close_times: _propTypes2.default.array,
     onChange: _propTypes2.default.func,
     server_time: _propTypes2.default.object,
     sessions: _mobxReact.PropTypes.arrayOrObservableArray,
@@ -16400,6 +16050,10 @@ var WS = function () {
         return _socket_base2.default.send({ get_settings: 1 });
     };
 
+    var getTradingTimes = function getTradingTimes(date) {
+        return _socket_base2.default.send({ trading_times: date });
+    };
+
     var landingCompany = function landingCompany(residence) {
         return _socket_base2.default.send({ landing_company: residence });
     };
@@ -16491,6 +16145,7 @@ var WS = function () {
         getAccountStatus: getAccountStatus,
         getSelfExclusion: getSelfExclusion,
         getSettings: getSettings,
+        getTradingTimes: getTradingTimes,
         landingCompany: landingCompany,
         logout: logout,
         mt5LoginList: mt5LoginList,
@@ -18873,34 +18528,63 @@ var _contract_type2 = _interopRequireDefault(_contract_type);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var onChangeStartDate = exports.onChangeStartDate = function onChangeStartDate(store) {
-    var contract_type = store.contract_type,
-        start_date = store.start_date,
-        duration_unit = store.duration_unit,
-        expiry_time = store.expiry_time,
-        expiry_type = store.expiry_type;
-    var start_time = store.start_time,
-        expiry_date = store.expiry_date;
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+var onChangeStartDate = exports.onChangeStartDate = function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(store) {
+        var contract_type, duration_unit, expiry_time, expiry_type, start_date, symbol, server_time, start_time, expiry_date, obj_contract_start_type, contract_start_type, obj_sessions, sessions, obj_start_time, obj_duration_units_list, obj_duration_unit, obj_expiry_date, obj_expiry_time, obj_duration_min_max, obj_market_close_times;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+                switch (_context.prev = _context.next) {
+                    case 0:
+                        contract_type = store.contract_type, duration_unit = store.duration_unit, expiry_time = store.expiry_time, expiry_type = store.expiry_type, start_date = store.start_date, symbol = store.symbol;
+                        server_time = store.root_store.common.server_time;
+                        start_time = store.start_time, expiry_date = store.expiry_date;
 
 
-    var obj_contract_start_type = _contract_type2.default.getStartType(start_date);
-    var contract_start_type = obj_contract_start_type.contract_start_type;
-    var obj_sessions = _contract_type2.default.getSessions(contract_type, start_date);
-    var sessions = obj_sessions.sessions;
-    var obj_start_time = _contract_type2.default.getStartTime(sessions, start_date, start_time);
-    start_time = obj_start_time.start_time;
+                        start_time = start_time || server_time.clone().add(6, 'minute').format('HH:mm'); // when there is not a default value for start_time, it should be set more than 5 min after server_time
 
-    var obj_duration_units_list = _contract_type2.default.getDurationUnitsList(contract_type, contract_start_type);
-    var obj_duration_unit = _contract_type2.default.getDurationUnit(duration_unit, contract_type, contract_start_type);
+                        obj_contract_start_type = _contract_type2.default.getStartType(start_date);
+                        contract_start_type = obj_contract_start_type.contract_start_type;
+                        obj_sessions = _contract_type2.default.getSessions(contract_type, start_date);
+                        sessions = obj_sessions.sessions;
+                        obj_start_time = _contract_type2.default.getStartTime(sessions, start_date, start_time);
 
-    var obj_expiry_date = _contract_type2.default.getExpiryDate(expiry_date, start_date, expiry_type);
-    expiry_date = obj_expiry_date.expiry_date;
-    var obj_expiry_time = _contract_type2.default.getExpiryTime(sessions, start_date, start_time, expiry_date, expiry_time);
+                        start_time = obj_start_time.start_time;
 
-    var obj_duration_min_max = _contract_type2.default.getDurationMinMax(contract_type, contract_start_type);
+                        obj_duration_units_list = _contract_type2.default.getDurationUnitsList(contract_type, contract_start_type);
+                        obj_duration_unit = _contract_type2.default.getDurationUnit(duration_unit, contract_type, contract_start_type);
+                        obj_expiry_date = _contract_type2.default.getExpiryDate(expiry_date, start_date, expiry_type);
 
-    return _extends({}, obj_contract_start_type, obj_duration_units_list, obj_duration_min_max, obj_duration_unit, obj_sessions, obj_start_time, obj_expiry_date, obj_expiry_time);
-};
+                        expiry_date = obj_expiry_date.expiry_date;
+                        _context.next = 16;
+                        return _contract_type2.default.getExpiryTime(sessions, start_date, start_time, expiry_date, expiry_time, expiry_type, server_time, symbol);
+
+                    case 16:
+                        obj_expiry_time = _context.sent;
+                        obj_duration_min_max = _contract_type2.default.getDurationMinMax(contract_type, contract_start_type);
+                        _context.next = 20;
+                        return _contract_type2.default.getTradingTimes(expiry_date, symbol);
+
+                    case 20:
+                        _context.t0 = _context.sent;
+                        obj_market_close_times = {
+                            market_close_times: _context.t0
+                        };
+                        return _context.abrupt('return', _extends({}, obj_contract_start_type, obj_duration_units_list, obj_duration_min_max, obj_duration_unit, obj_sessions, obj_start_time, obj_expiry_date, obj_expiry_time, obj_market_close_times));
+
+                    case 23:
+                    case 'end':
+                        return _context.stop();
+                }
+            }
+        }, _callee, undefined);
+    }));
+
+    return function onChangeStartDate(_x) {
+        return _ref.apply(this, arguments);
+    };
+}();
 
 /***/ }),
 
@@ -18985,7 +18669,6 @@ var getLocalizedBasis = exports.getLocalizedBasis = function getLocalizedBasis()
 var getContractTypesConfig = exports.getContractTypesConfig = function getContractTypesConfig() {
     return {
         rise_fall: { title: (0, _localize.localize)('Rise/Fall'), trade_types: ['CALL', 'PUT'], basis: ['payout', 'stake'], components: ['start_date'], barrier_count: 0 },
-        rise_fall_equal: { title: (0, _localize.localize)('Rise/Fall'), trade_types: ['CALLE', 'PUTE'], basis: ['payout', 'stake'], components: ['start_date'], barrier_count: 0 },
         high_low: { title: (0, _localize.localize)('Higher/Lower'), trade_types: ['CALL', 'PUT'], basis: ['payout', 'stake'], components: ['barrier'], barrier_count: 1 },
         touch: { title: (0, _localize.localize)('Touch/No Touch'), trade_types: ['ONETOUCH', 'NOTOUCH'], basis: ['payout', 'stake'], components: ['barrier'] },
         end: { title: (0, _localize.localize)('Ends Between/Ends Outside'), trade_types: ['EXPIRYMISS', 'EXPIRYRANGE'], basis: ['payout', 'stake'], components: ['barrier'] },
@@ -19003,7 +18686,7 @@ var getContractTypesConfig = exports.getContractTypesConfig = function getContra
 var getContractCategoriesConfig = exports.getContractCategoriesConfig = function getContractCategoriesConfig() {
     var _ref;
 
-    return _ref = {}, _defineProperty(_ref, (0, _localize.localize)('Up/Down'), ['rise_fall', 'high_low', 'rise_fall_equal']), _defineProperty(_ref, (0, _localize.localize)('Touch/No Touch'), ['touch']), _defineProperty(_ref, (0, _localize.localize)('In/Out'), ['end', 'stay']), _defineProperty(_ref, (0, _localize.localize)('Asians'), ['asian']), _defineProperty(_ref, (0, _localize.localize)('Digits'), ['match_diff', 'even_odd', 'over_under']), _ref;
+    return _ref = {}, _defineProperty(_ref, (0, _localize.localize)('Up/Down'), ['rise_fall', 'high_low']), _defineProperty(_ref, (0, _localize.localize)('Touch/No Touch'), ['touch']), _defineProperty(_ref, (0, _localize.localize)('In/Out'), ['end', 'stay']), _defineProperty(_ref, (0, _localize.localize)('Asians'), ['asian']), _defineProperty(_ref, (0, _localize.localize)('Digits'), ['match_diff', 'even_odd', 'over_under']), _ref;
 };
 
 /***/ }),
@@ -19032,7 +18715,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 // list of trade's options that should be used in query string of trade page url.
-var allowed_query_string_variables = exports.allowed_query_string_variables = ['amount', 'barrier_1', 'barrier_2', 'basis', 'contract_start_type', 'contract_type', 'duration', 'duration_unit', 'expiry_date', 'expiry_type', 'is_equal_checked', 'last_digit', 'start_date', 'start_time', 'symbol'];
+var allowed_query_string_variables = exports.allowed_query_string_variables = ['amount', 'barrier_1', 'barrier_2', 'basis', 'contract_start_type', 'contract_type', 'duration', 'duration_unit', 'expiry_date', 'expiry_type', 'last_digit', 'start_date', 'start_time', 'symbol'];
 
 var getNonProposalQueryStringVariables = exports.getNonProposalQueryStringVariables = function getNonProposalQueryStringVariables(store) {
     var non_proposal_query_string_variables = ['contract_start_type', 'expiry_type'];
@@ -19283,12 +18966,15 @@ var _start_date = __webpack_require__(/*! ./start_date */ "./src/javascript/app_
 
 var _contract = __webpack_require__(/*! ../Constants/contract */ "./src/javascript/app_2/Stores/Modules/Trading/Constants/contract.js");
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var ContractType = function () {
     var available_contract_types = {};
     var available_categories = {};
     var contract_types = void 0;
+    var trading_times = {};
 
     var buildContractTypesConfig = function buildContractTypesConfig(symbol) {
         return _Services.WS.contractsFor(symbol).then(function (r) {
@@ -19465,10 +19151,6 @@ var ContractType = function () {
         return { duration_min_max: duration_min_max };
     };
 
-    var getFullContractTypes = function getFullContractTypes() {
-        return available_contract_types;
-    };
-
     var getStartType = function getStartType(start_date) {
         return {
             // Number(0) refers to 'now'
@@ -19531,15 +19213,12 @@ var ContractType = function () {
     };
 
     var buildMoment = function buildMoment(date, time) {
-        var moment_date = (0, _Date.toMoment)(date);
-        if (!time || !(0, _Date.isTimeValid)(time)) return moment_date;
+        var _ref = (0, _Date.isTimeValid)(time) ? time.split(':') : [0, 0],
+            _ref2 = _slicedToArray(_ref, 2),
+            hour = _ref2[0],
+            minute = _ref2[1];
 
-        var _time$split = time.split(':'),
-            _time$split2 = _slicedToArray(_time$split, 2),
-            hour = _time$split2[0],
-            minute = _time$split2[1];
-
-        return moment_date.hour(hour).minute(minute);
+        return (0, _Date.toMoment)(date).hour(hour).minute(minute);
     };
 
     var getStartTime = function getStartTime(sessions, start_date, start_time) {
@@ -19548,34 +19227,159 @@ var ContractType = function () {
         };
     };
 
-    var getExpiryDate = function getExpiryDate(expiry_date, start_date, expiry_type) {
-        var moment_start = (0, _Date.toMoment)(start_date);
-        var moment_expiry = (0, _Date.toMoment)(expiry_date);
-        // forward starting contracts should only show today and tomorrow as expiry date
-        var is_invalid = moment_expiry.isBefore(moment_start, 'day') || start_date && moment_expiry.isAfter(moment_start.clone().add(1, 'day'));
-        return {
-            expiry_date: expiry_type === 'endtime' ? (is_invalid ? moment_start : moment_expiry).format('YYYY-MM-DD') : null
+    var getTradingTimes = function () {
+        var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(date) {
+            var underlying = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+            var trading_times_response, i, submarkets, j, symbols, k, symbol;
+            return regeneratorRuntime.wrap(function _callee$(_context) {
+                while (1) {
+                    switch (_context.prev = _context.next) {
+                        case 0:
+                            if (date) {
+                                _context.next = 2;
+                                break;
+                            }
+
+                            return _context.abrupt('return', []);
+
+                        case 2:
+                            if (date in trading_times) {
+                                _context.next = 7;
+                                break;
+                            }
+
+                            _context.next = 5;
+                            return _Services.WS.getTradingTimes(date);
+
+                        case 5:
+                            trading_times_response = _context.sent;
+
+
+                            if ((0, _utility.getPropertyValue)(trading_times_response, ['trading_times', 'markets'])) {
+                                for (i = 0; i < trading_times_response.trading_times.markets.length; i++) {
+                                    submarkets = trading_times_response.trading_times.markets[i].submarkets;
+
+                                    if (submarkets) {
+                                        for (j = 0; j < submarkets.length; j++) {
+                                            symbols = submarkets[j].symbols;
+
+                                            if (symbols) {
+                                                for (k = 0; k < symbols.length; k++) {
+                                                    symbol = symbols[k];
+
+                                                    if (!trading_times[trading_times_response.echo_req.trading_times]) {
+                                                        trading_times[trading_times_response.echo_req.trading_times] = {};
+                                                    }
+                                                    trading_times[trading_times_response.echo_req.trading_times][symbol.symbol] = symbol.times.close;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        case 7:
+                            return _context.abrupt('return', underlying ? trading_times[date][underlying] : trading_times[date]);
+
+                        case 8:
+                        case 'end':
+                            return _context.stop();
+                    }
+                }
+            }, _callee, undefined);
+        }));
+
+        return function getTradingTimes(_x2) {
+            return _ref3.apply(this, arguments);
         };
+    }();
+
+    var getExpiryDate = function getExpiryDate(expiry_date, start_date, expiry_type) {
+        var proper_expiry_date = null;
+
+        if (expiry_type === 'endtime') {
+            var moment_start = (0, _Date.toMoment)(start_date);
+            var moment_expiry = (0, _Date.toMoment)(expiry_date);
+            // forward starting contracts should only show today and tomorrow as expiry date
+            var is_invalid = moment_expiry.isBefore(moment_start, 'day') || start_date && moment_expiry.isAfter(moment_start.clone().add(1, 'day'));
+            proper_expiry_date = (is_invalid ? moment_start : moment_expiry).format('YYYY-MM-DD');
+        }
+
+        return { expiry_date: proper_expiry_date };
     };
 
-    // has to follow the correct order of checks:
+    // It has to follow the correct order of checks:
     // first check if end time is within available sessions
-    // then confirm that end time is after start time
-    var getExpiryTime = function getExpiryTime(sessions, start_date, start_time, expiry_date, expiry_time) {
-        var start_moment = start_date ? buildMoment(start_date, start_time) : (0, _Date.toMoment)();
-        var end_moment = buildMoment(expiry_date, expiry_time);
+    // then confirm that end time is at least 5 minute after start time
+    var getExpiryTime = function () {
+        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(sessions, start_date, start_time, expiry_date, expiry_time, expiry_type, server_time, symbol) {
+            var end_time, market_close_time, market_close_times, start_moment, end_moment, expiry_sessions, is_end_of_day, is_end_of_session;
+            return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                while (1) {
+                    switch (_context2.prev = _context2.next) {
+                        case 0:
+                            end_time = null;
 
-        var end_time = expiry_time;
-        if (sessions && !(0, _start_date.isSessionAvailable)(sessions, end_moment)) {
-            end_time = getValidTime(sessions, end_moment, start_moment);
-        }
-        if (end_moment.isSameOrBefore(start_moment)) {
-            var is_end_of_day = start_moment.get('hours') === 23 && start_moment.get('minute') >= 55;
-            var is_end_of_session = sessions && !(0, _start_date.isSessionAvailable)(sessions, start_moment.clone().add(5, 'minutes'));
-            end_time = start_moment.clone().add(is_end_of_day || is_end_of_session ? 0 : 5, 'minutes').format('HH:mm');
-        }
-        return { expiry_time: end_time };
-    };
+                            if (!(expiry_type === 'endtime')) {
+                                _context2.next = 8;
+                                break;
+                            }
+
+                            market_close_time = '23:59:59';
+                            _context2.next = 5;
+                            return getTradingTimes(expiry_date, symbol);
+
+                        case 5:
+                            market_close_times = _context2.sent;
+
+
+                            if (market_close_times && market_close_times.length && market_close_times[0] !== '--') {
+                                // Some of underlyings (e.g. Australian Index) have two close time during a day so we always select the further one as the end time of the contract.
+                                market_close_time = market_close_times.slice(-1)[0];
+                            }
+
+                            // For contracts with a duration of more that 24 hours must set the expiry_time to the end of the day or the market's close time on that day.
+                            if (!start_date && server_time.isBefore(buildMoment(expiry_date), 'day')) {
+                                end_time = market_close_time;
+                            } else {
+                                start_moment = start_date ? buildMoment(start_date, start_time) : server_time;
+                                end_moment = buildMoment(expiry_date, expiry_time);
+
+                                end_time = buildMoment(end_moment, expiry_time).format('HH:mm');
+
+                                // When the contract is forwarding, and the duration is endtime, users can purchase the contract within 24 hours.
+                                expiry_sessions = [{
+                                    open: start_moment.clone().add(5, 'minute'), // expiry time should be at least 5 minute after start_time
+                                    close: (0, _Date.minDate)(start_moment.clone().add(24, 'hour'), buildMoment(expiry_date, market_close_time))
+                                }];
+
+
+                                if (!(0, _start_date.isSessionAvailable)(expiry_sessions, end_moment)) {
+                                    end_time = getValidTime(expiry_sessions, end_moment.clone(), start_moment.clone());
+                                }
+                                if (end_moment.isSameOrBefore(start_moment) || end_moment.diff(start_moment, 'minute') < 5) {
+                                    is_end_of_day = start_moment.get('hours') === 23 && start_moment.get('minute') >= 55;
+                                    is_end_of_session = sessions && !(0, _start_date.isSessionAvailable)(sessions, start_moment.clone().add(5, 'minutes'));
+
+                                    end_time = start_moment.clone().add(is_end_of_day || is_end_of_session ? 0 : 5, 'minutes').format('HH:mm');
+                                }
+                            }
+
+                        case 8:
+                            return _context2.abrupt('return', { expiry_time: end_time });
+
+                        case 9:
+                        case 'end':
+                            return _context2.stop();
+                    }
+                }
+            }, _callee2, undefined);
+        }));
+
+        return function getExpiryTime(_x4, _x5, _x6, _x7, _x8, _x9, _x10, _x11) {
+            return _ref4.apply(this, arguments);
+        };
+    }();
 
     var getTradeTypes = function getTradeTypes(contract_type) {
         return {
@@ -19616,13 +19420,12 @@ var ContractType = function () {
         getDurationMinMax: getDurationMinMax,
         getDurationUnit: getDurationUnit,
         getDurationUnitsList: getDurationUnitsList,
-        getFullContractTypes: getFullContractTypes,
         getExpiryDate: getExpiryDate,
         getExpiryTime: getExpiryTime,
         getSessions: getSessions,
         getStartTime: getStartTime,
         getStartType: getStartType,
-
+        getTradingTimes: getTradingTimes,
         getContractCategories: function getContractCategories() {
             return { contract_types_list: available_categories };
         }
@@ -19866,21 +19669,42 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 var processTradeParams = exports.processTradeParams = function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(store, new_state) {
-        var snapshot;
+        var snapshot, functions, i;
         return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
                     case 0:
                         snapshot = store.getSnapshot();
+                        functions = getMethodsList(store, new_state);
 
+                        // To make sure that every function is invoked and affects the snapshot respectively, we have to use for instead of forEach
 
-                        getMethodsList(store, new_state).forEach(function (fnc) {
-                            extendOrReplace(snapshot, fnc(snapshot));
-                        });
-
-                        return _context.abrupt('return', snapshot);
+                        i = 0;
 
                     case 3:
+                        if (!(i < functions.length)) {
+                            _context.next = 13;
+                            break;
+                        }
+
+                        _context.t0 = extendOrReplace;
+                        _context.t1 = snapshot;
+                        _context.next = 8;
+                        return functions[i](snapshot);
+
+                    case 8:
+                        _context.t2 = _context.sent;
+                        (0, _context.t0)(_context.t1, _context.t2);
+
+                    case 10:
+                        i++;
+                        _context.next = 3;
+                        break;
+
+                    case 13:
+                        return _context.abrupt('return', snapshot);
+
+                    case 14:
                     case 'end':
                         return _context.stop();
                 }
@@ -19900,7 +19724,7 @@ var getMethodsList = function getMethodsList(store, new_state) {
 
 // Some values need to be replaced, not extended
 var extendOrReplace = function extendOrReplace(source, new_values) {
-    var to_replace = ['contract_types_list', 'duration_units_list', 'form_components', 'trade_types'];
+    var to_replace = ['contract_types_list', 'duration_units_list', 'form_components', 'market_close_times', 'trade_types'];
 
     to_replace.forEach(function (key) {
         if (key in new_values) {
@@ -19972,10 +19796,7 @@ var createProposalRequestForContract = function createProposalRequestForContract
     var obj_expiry = {};
     if (store.expiry_type === 'endtime') {
         var expiry_date = (0, _Date.toMoment)(store.expiry_date);
-        var start_date = (0, _Date.toMoment)(store.start_date || store.root_store.common.server_time);
-        var is_same_day = expiry_date.isSame(start_date, 'day');
-        var expiry_time = is_same_day ? store.expiry_time : '23:59:59';
-        obj_expiry.date_expiry = (0, _Date.convertToUnix)(expiry_date.unix(), expiry_time);
+        obj_expiry.date_expiry = (0, _Date.convertToUnix)(expiry_date.unix(), store.expiry_time);
     }
 
     return _extends({
@@ -20072,7 +19893,7 @@ var isSessionAvailable = exports.isSessionAvailable = function isSessionAvailabl
     var start_moment = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : (0, _Date.toMoment)();
     var should_only_check_hour = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
     return !isBeforeDate(compare_moment, undefined, should_only_check_hour) && !isBeforeDate(compare_moment, start_moment, should_only_check_hour) && (!sessions.length || !!sessions.find(function (session) {
-        return compare_moment.isBetween(should_only_check_hour ? session.open.clone().minute(0) : session.open, session.close, null, '[]');
+        return compare_moment.isBetween(session.open, session.close, should_only_check_hour ? 'hour' : null, '[]');
     }));
 };
 
@@ -20122,7 +19943,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15, _descriptor16, _descriptor17, _descriptor18, _descriptor19, _descriptor20, _descriptor21, _descriptor22, _descriptor23, _descriptor24, _descriptor25, _descriptor26, _descriptor27, _descriptor28, _descriptor29, _descriptor30, _descriptor31, _descriptor32, _descriptor33;
+var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _descriptor12, _descriptor13, _descriptor14, _descriptor15, _descriptor16, _descriptor17, _descriptor18, _descriptor19, _descriptor20, _descriptor21, _descriptor22, _descriptor23, _descriptor24, _descriptor25, _descriptor26, _descriptor27, _descriptor28, _descriptor29, _descriptor30, _descriptor31, _descriptor32;
 
 var _lodash = __webpack_require__(/*! lodash.debounce */ "./node_modules/lodash.debounce/index.js");
 
@@ -20239,23 +20060,31 @@ function _initializerWarningHelper(descriptor, context) {
     throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
-var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _mobx.action.bound, _dec4 = _mobx.action.bound, _dec5 = _mobx.action.bound, _dec6 = _mobx.action.bound, _dec7 = _mobx.action.bound, _dec8 = _mobx.action.bound, _dec9 = _mobx.action.bound, _dec10 = _mobx.action.bound, _dec11 = _mobx.action.bound, _dec12 = _mobx.action.bound, _dec13 = _mobx.action.bound, _dec14 = _mobx.action.bound, _dec15 = _mobx.action.bound, _dec16 = _mobx.action.bound, _dec17 = _mobx.action.bound, (_class = function (_BaseStore) {
+var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 = _mobx.action.bound, _dec4 = _mobx.action.bound, _dec5 = _mobx.action.bound, _dec6 = _mobx.action.bound, _dec7 = _mobx.action.bound, _dec8 = _mobx.action.bound, _dec9 = _mobx.action.bound, _dec10 = _mobx.action.bound, _dec11 = _mobx.action.bound, _dec12 = _mobx.action.bound, _dec13 = _mobx.action.bound, _dec14 = _mobx.action.bound, _dec15 = _mobx.action.bound, _dec16 = _mobx.action.bound, (_class = function (_BaseStore) {
     _inherits(TradeStore, _BaseStore);
 
     // Chart
 
 
     // Purchase
-    // Number(0) refers to 'now'
 
 
-    // Barrier
+    // End Date Time
+    /**
+     * An array that contains market closing time.
+     *
+     * e.g. ["04:00:00", "08:00:00"]
+     *
+     */
 
 
-    // Amount
+    // Start Time
 
 
-    // Contract Type
+    // Duration
+
+
+    // Underlying
     function TradeStore(_ref) {
         var root_store = _ref.root_store;
 
@@ -20275,69 +20104,67 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
 
         _initDefineProp(_this, 'is_trade_enabled', _descriptor3, _this);
 
-        _initDefineProp(_this, 'is_allow_equal', _descriptor4, _this);
+        _initDefineProp(_this, 'symbol', _descriptor4, _this);
 
-        _initDefineProp(_this, 'is_equal_checked', _descriptor5, _this);
+        _initDefineProp(_this, 'contract_expiry_type', _descriptor5, _this);
 
-        _initDefineProp(_this, 'symbol', _descriptor6, _this);
+        _initDefineProp(_this, 'contract_start_type', _descriptor6, _this);
 
-        _initDefineProp(_this, 'contract_expiry_type', _descriptor7, _this);
+        _initDefineProp(_this, 'contract_type', _descriptor7, _this);
 
-        _initDefineProp(_this, 'contract_start_type', _descriptor8, _this);
+        _initDefineProp(_this, 'contract_types_list', _descriptor8, _this);
 
-        _initDefineProp(_this, 'contract_type', _descriptor9, _this);
+        _initDefineProp(_this, 'form_components', _descriptor9, _this);
 
-        _initDefineProp(_this, 'contract_types_list', _descriptor10, _this);
+        _initDefineProp(_this, 'trade_types', _descriptor10, _this);
 
-        _initDefineProp(_this, 'form_components', _descriptor11, _this);
+        _initDefineProp(_this, 'amount', _descriptor11, _this);
 
-        _initDefineProp(_this, 'trade_types', _descriptor12, _this);
+        _initDefineProp(_this, 'basis', _descriptor12, _this);
 
-        _initDefineProp(_this, 'amount', _descriptor13, _this);
+        _initDefineProp(_this, 'basis_list', _descriptor13, _this);
 
-        _initDefineProp(_this, 'basis', _descriptor14, _this);
+        _initDefineProp(_this, 'duration', _descriptor14, _this);
 
-        _initDefineProp(_this, 'basis_list', _descriptor15, _this);
+        _initDefineProp(_this, 'duration_unit', _descriptor15, _this);
 
-        _initDefineProp(_this, 'duration', _descriptor16, _this);
+        _initDefineProp(_this, 'duration_units_list', _descriptor16, _this);
 
-        _initDefineProp(_this, 'duration_unit', _descriptor17, _this);
+        _initDefineProp(_this, 'duration_min_max', _descriptor17, _this);
 
-        _initDefineProp(_this, 'duration_units_list', _descriptor18, _this);
+        _initDefineProp(_this, 'expiry_date', _descriptor18, _this);
 
-        _initDefineProp(_this, 'duration_min_max', _descriptor19, _this);
+        _initDefineProp(_this, 'expiry_time', _descriptor19, _this);
 
-        _initDefineProp(_this, 'expiry_date', _descriptor20, _this);
+        _initDefineProp(_this, 'expiry_type', _descriptor20, _this);
 
-        _initDefineProp(_this, 'expiry_time', _descriptor21, _this);
+        _initDefineProp(_this, 'barrier_1', _descriptor21, _this);
 
-        _initDefineProp(_this, 'expiry_type', _descriptor22, _this);
+        _initDefineProp(_this, 'barrier_2', _descriptor22, _this);
 
-        _initDefineProp(_this, 'barrier_1', _descriptor23, _this);
+        _initDefineProp(_this, 'barrier_count', _descriptor23, _this);
 
-        _initDefineProp(_this, 'barrier_2', _descriptor24, _this);
+        _initDefineProp(_this, 'start_date', _descriptor24, _this);
 
-        _initDefineProp(_this, 'barrier_count', _descriptor25, _this);
+        _initDefineProp(_this, 'start_dates_list', _descriptor25, _this);
 
-        _initDefineProp(_this, 'start_date', _descriptor26, _this);
+        _initDefineProp(_this, 'start_time', _descriptor26, _this);
 
-        _initDefineProp(_this, 'start_dates_list', _descriptor27, _this);
+        _initDefineProp(_this, 'sessions', _descriptor27, _this);
 
-        _initDefineProp(_this, 'start_time', _descriptor28, _this);
+        _initDefineProp(_this, 'market_close_times', _descriptor28, _this);
 
-        _initDefineProp(_this, 'sessions', _descriptor29, _this);
+        _initDefineProp(_this, 'last_digit', _descriptor29, _this);
 
-        _initDefineProp(_this, 'last_digit', _descriptor30, _this);
+        _initDefineProp(_this, 'proposal_info', _descriptor30, _this);
 
-        _initDefineProp(_this, 'proposal_info', _descriptor31, _this);
-
-        _initDefineProp(_this, 'purchase_info', _descriptor32, _this);
+        _initDefineProp(_this, 'purchase_info', _descriptor31, _this);
 
         _this.chart_id = 1;
         _this.debouncedProposal = (0, _lodash2.default)(_this.requestProposal, 500);
         _this.proposal_requests = {};
 
-        _initDefineProp(_this, 'init', _descriptor33, _this);
+        _initDefineProp(_this, 'init', _descriptor32, _this);
 
         Object.defineProperty(_this, 'is_query_string_applied', {
             enumerable: false,
@@ -20350,24 +20177,20 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
         }, function () {
             _this.changeDurationValidationRules();
         });
-        (0, _mobx.reaction)(function () {
-            return [_this.symbol, _this.contract_type, _this.duration_unit, _this.expiry_type, _this.duration_units_list, _this.contract_types_list];
-        }, function () {
-            _this.changeAllowEquals();
-        }, { delay: 500 });
         return _this;
     }
 
     // Last Digit
+    // Number(0) refers to 'now'
 
 
-    // Start Time
+    // Barrier
 
 
-    // Duration
+    // Amount
 
 
-    // Underlying
+    // Contract Type
 
 
     _createClass(TradeStore, [{
@@ -20465,22 +20288,10 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
         value: function onChange(e) {
             var _e$target = e.target,
                 name = _e$target.name,
-                checked = _e$target.checked;
-            var value = e.target.value;
-
+                value = _e$target.value;
 
             if (name === 'currency') {
                 this.root_store.client.selectCurrency(value);
-            } else if (value === 'is_equal') {
-                if (/^(rise_fall|rise_fall_equal)$/.test(this.contract_type)) {
-                    if (checked) {
-                        this.is_equal_checked = 1;
-                        value = 'rise_fall_equal';
-                    } else {
-                        this.is_equal_checked = 0;
-                        value = 'rise_fall';
-                    }
-                }
             } else if (!(name in this)) {
                 throw new Error('Invalid Argument: ' + name);
             }
@@ -20532,7 +20343,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
             var _this4 = this;
 
             Object.keys((0, _utility.cloneObject)(new_state)).forEach(function (key) {
-                if (key === 'root_store' || ['validation_rules', 'validation_errors', 'currency'].indexOf(key) > -1) return;
+                if (key === 'root_store' || ['validation_rules', 'validation_errors', 'currency', 'smart_chart'].indexOf(key) > -1) return;
                 if (JSON.stringify(_this4[key]) === JSON.stringify(new_state[key])) {
                     delete new_state[key];
                 } else {
@@ -20736,81 +20547,44 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
             }
         }
     }, {
-        key: 'changeAllowEquals',
-        value: function changeAllowEquals() {
-            var _this6 = this;
-
-            var hasCallPutEqual = function hasCallPutEqual() {
-                var up_down_contracts = (0, _utility.getPropertyValue)(_this6.contract_types_list, 'Up/Down');
-                return up_down_contracts.some(function (contract) {
-                    return contract.value === 'rise_fall_equal';
-                });
-            };
-            var hasDurationForCallPutEqual = function hasDurationForCallPutEqual(contract_type_list, duration_unit, contract_start_type) {
-                var contract_list = Object.keys(contract_type_list || {}).reduce(function (key, list) {
-                    return [].concat(_toConsumableArray(key), _toConsumableArray(contract_type_list[list].map(function (contract) {
-                        return contract.value;
-                    })));
-                }, []);
-
-                var contract_duration_list = contract_list.map(function (list) {
-                    return _defineProperty({}, list, (0, _utility.getPropertyValue)(_contract_type2.default.getFullContractTypes(), [list, 'config', 'durations', 'units_display', contract_start_type]));
-                });
-
-                // Check whether rise fall equal is exists and has the current store duration unit
-                return hasCallPutEqual() ? contract_duration_list.filter(function (contract) {
-                    return contract.rise_fall_equal;
-                })[0].rise_fall_equal.some(function (duration) {
-                    return duration.value === duration_unit;
-                }) : false;
-            };
-            var check_callput_equal_duration = hasDurationForCallPutEqual(this.contract_types_list, this.duration_unit, this.contract_start_type);
-
-            if (/^(rise_fall|rise_fall_equal)$/.test(this.contract_type) && (check_callput_equal_duration || this.expiry_type === 'endtime') && hasCallPutEqual()) {
-                this.is_allow_equal = true;
-            } else {
-                this.is_allow_equal = false;
-            }
-        }
-    }, {
         key: 'accountSwitcherListener',
         value: function accountSwitcherListener() {
-            var _this7 = this;
+            var _this6 = this;
 
             return new Promise(function () {
-                var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(resolve) {
+                var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(resolve) {
                     return regeneratorRuntime.wrap(function _callee4$(_context4) {
                         while (1) {
                             switch (_context4.prev = _context4.next) {
                                 case 0:
                                     _context4.next = 2;
-                                    return _this7.refresh();
+                                    return _this6.refresh();
 
                                 case 2:
                                     _context4.next = 4;
-                                    return _this7.prepareTradeStore();
+                                    return _this6.prepareTradeStore();
 
                                 case 4:
-                                    return _context4.abrupt('return', resolve(_this7.debouncedProposal()));
+                                    return _context4.abrupt('return', resolve(_this6.debouncedProposal()));
 
                                 case 5:
                                 case 'end':
                                     return _context4.stop();
                             }
                         }
-                    }, _callee4, _this7);
+                    }, _callee4, _this6);
                 }));
 
                 return function (_x3) {
-                    return _ref6.apply(this, arguments);
+                    return _ref5.apply(this, arguments);
                 };
             }());
         }
     }, {
         key: 'onMount',
         value: function () {
-            var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-                var _this8 = this;
+            var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+                var _this7 = this;
 
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
@@ -20822,7 +20596,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
                             case 2:
                                 this.debouncedProposal();
                                 (0, _mobx.runInAction)(function () {
-                                    _this8.is_trade_component_mounted = true;
+                                    _this7.is_trade_component_mounted = true;
                                 });
                                 this.updateQueryString();
                                 this.onSwitchAccount(this.accountSwitcherListener);
@@ -20836,7 +20610,7 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
             }));
 
             function onMount() {
-                return _ref7.apply(this, arguments);
+                return _ref6.apply(this, arguments);
             }
 
             return onMount;
@@ -20866,153 +20640,148 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
     initializer: function initializer() {
         return false;
     }
-}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, 'is_allow_equal', [_mobx.observable], {
-    enumerable: true,
-    initializer: function initializer() {
-        return false;
-    }
-}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'is_equal_checked', [_mobx.observable], {
-    enumerable: true,
-    initializer: function initializer() {
-        return 0;
-    }
-}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'symbol', [_mobx.observable], {
+}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, 'symbol', [_mobx.observable], {
     enumerable: true,
     initializer: null
-}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'contract_expiry_type', [_mobx.observable], {
+}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'contract_expiry_type', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'contract_start_type', [_mobx.observable], {
+}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'contract_start_type', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, 'contract_type', [_mobx.observable], {
+}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'contract_type', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, 'contract_types_list', [_mobx.observable], {
+}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'contract_types_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor11 = _applyDecoratedDescriptor(_class.prototype, 'form_components', [_mobx.observable], {
+}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, 'form_components', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor12 = _applyDecoratedDescriptor(_class.prototype, 'trade_types', [_mobx.observable], {
+}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, 'trade_types', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor13 = _applyDecoratedDescriptor(_class.prototype, 'amount', [_mobx.observable], {
+}), _descriptor11 = _applyDecoratedDescriptor(_class.prototype, 'amount', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 10;
     }
-}), _descriptor14 = _applyDecoratedDescriptor(_class.prototype, 'basis', [_mobx.observable], {
+}), _descriptor12 = _applyDecoratedDescriptor(_class.prototype, 'basis', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor15 = _applyDecoratedDescriptor(_class.prototype, 'basis_list', [_mobx.observable], {
+}), _descriptor13 = _applyDecoratedDescriptor(_class.prototype, 'basis_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor16 = _applyDecoratedDescriptor(_class.prototype, 'duration', [_mobx.observable], {
+}), _descriptor14 = _applyDecoratedDescriptor(_class.prototype, 'duration', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 5;
     }
-}), _descriptor17 = _applyDecoratedDescriptor(_class.prototype, 'duration_unit', [_mobx.observable], {
+}), _descriptor15 = _applyDecoratedDescriptor(_class.prototype, 'duration_unit', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor18 = _applyDecoratedDescriptor(_class.prototype, 'duration_units_list', [_mobx.observable], {
+}), _descriptor16 = _applyDecoratedDescriptor(_class.prototype, 'duration_units_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor19 = _applyDecoratedDescriptor(_class.prototype, 'duration_min_max', [_mobx.observable], {
+}), _descriptor17 = _applyDecoratedDescriptor(_class.prototype, 'duration_min_max', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor20 = _applyDecoratedDescriptor(_class.prototype, 'expiry_date', [_mobx.observable], {
+}), _descriptor18 = _applyDecoratedDescriptor(_class.prototype, 'expiry_date', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor21 = _applyDecoratedDescriptor(_class.prototype, 'expiry_time', [_mobx.observable], {
+}), _descriptor19 = _applyDecoratedDescriptor(_class.prototype, 'expiry_time', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
-        return '09:40';
+        return '';
     }
-}), _descriptor22 = _applyDecoratedDescriptor(_class.prototype, 'expiry_type', [_mobx.observable], {
+}), _descriptor20 = _applyDecoratedDescriptor(_class.prototype, 'expiry_type', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 'duration';
     }
-}), _descriptor23 = _applyDecoratedDescriptor(_class.prototype, 'barrier_1', [_mobx.observable], {
+}), _descriptor21 = _applyDecoratedDescriptor(_class.prototype, 'barrier_1', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor24 = _applyDecoratedDescriptor(_class.prototype, 'barrier_2', [_mobx.observable], {
+}), _descriptor22 = _applyDecoratedDescriptor(_class.prototype, 'barrier_2', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return '';
     }
-}), _descriptor25 = _applyDecoratedDescriptor(_class.prototype, 'barrier_count', [_mobx.observable], {
+}), _descriptor23 = _applyDecoratedDescriptor(_class.prototype, 'barrier_count', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 0;
     }
-}), _descriptor26 = _applyDecoratedDescriptor(_class.prototype, 'start_date', [_mobx.observable], {
+}), _descriptor24 = _applyDecoratedDescriptor(_class.prototype, 'start_date', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return Number(0);
     }
-}), _descriptor27 = _applyDecoratedDescriptor(_class.prototype, 'start_dates_list', [_mobx.observable], {
+}), _descriptor25 = _applyDecoratedDescriptor(_class.prototype, 'start_dates_list', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor28 = _applyDecoratedDescriptor(_class.prototype, 'start_time', [_mobx.observable], {
+}), _descriptor26 = _applyDecoratedDescriptor(_class.prototype, 'start_time', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return null;
     }
-}), _descriptor29 = _applyDecoratedDescriptor(_class.prototype, 'sessions', [_mobx.observable], {
+}), _descriptor27 = _applyDecoratedDescriptor(_class.prototype, 'sessions', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return [];
     }
-}), _descriptor30 = _applyDecoratedDescriptor(_class.prototype, 'last_digit', [_mobx.observable], {
+}), _descriptor28 = _applyDecoratedDescriptor(_class.prototype, 'market_close_times', [_mobx.observable], {
+    enumerable: true,
+    initializer: function initializer() {
+        return [];
+    }
+}), _descriptor29 = _applyDecoratedDescriptor(_class.prototype, 'last_digit', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return 5;
     }
-}), _descriptor31 = _applyDecoratedDescriptor(_class.prototype, 'proposal_info', [_mobx.observable], {
+}), _descriptor30 = _applyDecoratedDescriptor(_class.prototype, 'proposal_info', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor32 = _applyDecoratedDescriptor(_class.prototype, 'purchase_info', [_mobx.observable], {
+}), _descriptor31 = _applyDecoratedDescriptor(_class.prototype, 'purchase_info', [_mobx.observable], {
     enumerable: true,
     initializer: function initializer() {
         return {};
     }
-}), _descriptor33 = _applyDecoratedDescriptor(_class.prototype, 'init', [_dec], {
+}), _descriptor32 = _applyDecoratedDescriptor(_class.prototype, 'init', [_dec], {
     enumerable: true,
     initializer: function initializer() {
-        var _this9 = this;
+        var _this8 = this;
 
         return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
             return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -21027,10 +20796,10 @@ var TradeStore = (_dec = _mobx.action.bound, _dec2 = _mobx.action.bound, _dec3 =
                             return _context6.stop();
                     }
                 }
-            }, _callee6, _this9);
+            }, _callee6, _this8);
         }));
     }
-}), _applyDecoratedDescriptor(_class.prototype, 'refresh', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'refresh'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'prepareTradeStore', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'prepareTradeStore'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onChange', [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, 'onChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoverPurchase', [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoverPurchase'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onPurchase', [_dec6], Object.getOwnPropertyDescriptor(_class.prototype, 'onPurchase'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onClickNewTrade', [_dec7], Object.getOwnPropertyDescriptor(_class.prototype, 'onClickNewTrade'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'updateStore', [_dec8], Object.getOwnPropertyDescriptor(_class.prototype, 'updateStore'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'requestProposal', [_dec9], Object.getOwnPropertyDescriptor(_class.prototype, 'requestProposal'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onProposalResponse', [_dec10], Object.getOwnPropertyDescriptor(_class.prototype, 'onProposalResponse'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onChartBarrierChange', [_dec11], Object.getOwnPropertyDescriptor(_class.prototype, 'onChartBarrierChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'updateQueryString', [_dec12], Object.getOwnPropertyDescriptor(_class.prototype, 'updateQueryString'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'changeDurationValidationRules', [_dec13], Object.getOwnPropertyDescriptor(_class.prototype, 'changeDurationValidationRules'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'changeAllowEquals', [_dec14], Object.getOwnPropertyDescriptor(_class.prototype, 'changeAllowEquals'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'accountSwitcherListener', [_dec15], Object.getOwnPropertyDescriptor(_class.prototype, 'accountSwitcherListener'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMount', [_dec16], Object.getOwnPropertyDescriptor(_class.prototype, 'onMount'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onUnmount', [_dec17], Object.getOwnPropertyDescriptor(_class.prototype, 'onUnmount'), _class.prototype)), _class));
+}), _applyDecoratedDescriptor(_class.prototype, 'refresh', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'refresh'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'prepareTradeStore', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'prepareTradeStore'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onChange', [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, 'onChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoverPurchase', [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoverPurchase'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onPurchase', [_dec6], Object.getOwnPropertyDescriptor(_class.prototype, 'onPurchase'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onClickNewTrade', [_dec7], Object.getOwnPropertyDescriptor(_class.prototype, 'onClickNewTrade'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'updateStore', [_dec8], Object.getOwnPropertyDescriptor(_class.prototype, 'updateStore'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'requestProposal', [_dec9], Object.getOwnPropertyDescriptor(_class.prototype, 'requestProposal'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onProposalResponse', [_dec10], Object.getOwnPropertyDescriptor(_class.prototype, 'onProposalResponse'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onChartBarrierChange', [_dec11], Object.getOwnPropertyDescriptor(_class.prototype, 'onChartBarrierChange'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'updateQueryString', [_dec12], Object.getOwnPropertyDescriptor(_class.prototype, 'updateQueryString'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'changeDurationValidationRules', [_dec13], Object.getOwnPropertyDescriptor(_class.prototype, 'changeDurationValidationRules'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'accountSwitcherListener', [_dec14], Object.getOwnPropertyDescriptor(_class.prototype, 'accountSwitcherListener'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMount', [_dec15], Object.getOwnPropertyDescriptor(_class.prototype, 'onMount'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onUnmount', [_dec16], Object.getOwnPropertyDescriptor(_class.prototype, 'onUnmount'), _class.prototype)), _class));
 exports.default = TradeStore;
 
 /***/ }),
@@ -22858,7 +22627,7 @@ exports.default = UIStore;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isDateValid = exports.isMinuteValid = exports.isHourValid = exports.isTimeValid = exports.formatDuration = exports.getDiffDuration = exports.daysFromTodayTo = exports.formatDate = exports.toGMTFormat = exports.convertToUnix = exports.toMoment = exports.epochToMoment = undefined;
+exports.minDate = exports.isDateValid = exports.isMinuteValid = exports.isHourValid = exports.isTimeValid = exports.formatDuration = exports.getDiffDuration = exports.daysFromTodayTo = exports.formatDate = exports.toGMTFormat = exports.convertToUnix = exports.setTime = exports.toMoment = exports.epochToMoment = undefined;
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
@@ -22898,12 +22667,12 @@ var toMoment = exports.toMoment = function toMoment(value) {
  * @param  {String} time        24 hours format, may or may not include seconds
  * @return {moment} a new moment object of result
  */
-var setTime = function setTime(moment_obj, time) {
-  var _time$split = time.split(':'),
-      _time$split2 = _slicedToArray(_time$split, 3),
-      hour = _time$split2[0],
-      minute = _time$split2[1],
-      second = _time$split2[2];
+var setTime = exports.setTime = function setTime(moment_obj, time) {
+  var _ref = time ? time.split(':') : [0, 0, 0],
+      _ref2 = _slicedToArray(_ref, 3),
+      hour = _ref2[0],
+      minute = _ref2[1],
+      second = _ref2[2];
 
   moment_obj.hour(hour).minute(minute || 0).second(second || 0);
   return moment_obj;
@@ -22970,7 +22739,7 @@ var formatDuration = exports.formatDuration = function formatDuration(duration) 
  * @param {String} time_str time
  */
 var isTimeValid = exports.isTimeValid = function isTimeValid(time_str) {
-  return (/^(\d{1,2}):(\d{2})(:00)?$/.test(time_str)
+  return (/^([0-9]|[0-1][0-9]|2[0-3]):([0-9]|[0-5][0-9])(:([0-9]|[0-5][0-9]))?$/.test(time_str)
   );
 };
 
@@ -22996,6 +22765,15 @@ var isMinuteValid = exports.isMinuteValid = function isMinuteValid(time_str) {
  */
 var isDateValid = exports.isDateValid = function isDateValid(date_str) {
   return typeof date_str === 'string' && (0, _moment2.default)(date_str).isValid();
+};
+
+/**
+ * returns the minimum moment between the two passing parameters
+ * @param {moment|string|epoch} first datetime parameter
+ * @param {moment|string|epoch} second datetime parameter
+ */
+var minDate = exports.minDate = function minDate(date_1, date_2) {
+  return _moment2.default.min(toMoment(date_1), toMoment(date_2));
 };
 
 /***/ }),
