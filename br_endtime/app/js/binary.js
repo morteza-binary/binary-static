@@ -14670,9 +14670,10 @@ var Duration = function Duration(_ref) {
     } else if (expiry_type === 'endtime') {
         var max_daily_duration = duration_min_max.daily ? duration_min_max.daily.max : 365 * 24 * 3600;
         var moment_contract_start_date_time = (0, _Date.setTime)((0, _Date.toMoment)(start_date || server_time), (0, _Date.isTimeValid)(start_time) ? start_time : server_time.format('HH:mm'));
+        var has_intraday_duration_unit = (0, _duration.hasIntradayDurationUnit)(duration_units_list);
 
         // When the contract start is forwarding or is not forwarding but the expiry date is as same as start date, the contract should be expired within 24 hours
-        is_24_hours_contract = !!start_date || moment_expiry.isSame((0, _Date.toMoment)(server_time), 'day');
+        is_24_hours_contract = (!!start_date || moment_expiry.isSame((0, _Date.toMoment)(server_time), 'day')) && has_intraday_duration_unit;
 
         if (is_24_hours_contract) {
             var expiry_date_time = (0, _Date.setTime)(moment_expiry.clone(), moment_contract_start_date_time.clone().add(5, 'minute').format('HH:mm'));
@@ -14690,6 +14691,10 @@ var Duration = function Duration(_ref) {
         } else {
             min_date_expiry = moment_contract_start_date_time.clone().startOf('day');
             max_date_duration = moment_contract_start_date_time.clone().add(max_daily_duration, 'second');
+
+            if (!has_intraday_duration_unit) {
+                min_date_expiry.add(1, 'day');
+            }
         }
     }
     if (is_minimized) {
@@ -18921,7 +18926,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 var onChangeStartDate = exports.onChangeStartDate = function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(store) {
-        var contract_type, duration_unit, expiry_time, start_date, symbol, server_time, start_time, expiry_date, expiry_type, obj_contract_start_type, contract_start_type, obj_sessions, sessions, obj_start_time, obj_duration_units_list, obj_duration_unit, obj_expiry_type, obj_expiry_date, obj_market_close_times, market_close_times, obj_expiry_time, obj_duration_min_max;
+        var contract_type, duration_unit, expiry_time, start_date, symbol, server_time, start_time, expiry_date, expiry_type, obj_contract_start_type, contract_start_type, obj_sessions, sessions, obj_start_time, obj_duration_units_list, duration_units_list, obj_duration_unit, obj_expiry_type, obj_expiry_date, obj_market_close_times, market_close_times, obj_expiry_time, obj_duration_min_max;
         return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
@@ -18942,18 +18947,19 @@ var onChangeStartDate = exports.onChangeStartDate = function () {
                         start_time = obj_start_time.start_time;
 
                         obj_duration_units_list = _contract_type2.default.getDurationUnitsList(contract_type, contract_start_type);
+                        duration_units_list = obj_duration_units_list.duration_units_list;
                         obj_duration_unit = _contract_type2.default.getDurationUnit(duration_unit, contract_type, contract_start_type);
-                        obj_expiry_type = _contract_type2.default.getExpiryType(obj_duration_units_list.duration_units_list, expiry_type);
+                        obj_expiry_type = _contract_type2.default.getExpiryType(duration_units_list, expiry_type);
 
                         expiry_type = obj_expiry_type.expiry_type;
-                        obj_expiry_date = _contract_type2.default.getExpiryDate(expiry_date, start_date, expiry_type);
+                        obj_expiry_date = _contract_type2.default.getExpiryDate(duration_units_list, expiry_date, expiry_type, start_date);
 
                         expiry_date = obj_expiry_date.expiry_date;
 
-                        _context.next = 18;
+                        _context.next = 19;
                         return _contract_type2.default.getTradingTimes(expiry_date, symbol);
 
-                    case 18:
+                    case 19:
                         _context.t0 = _context.sent;
                         obj_market_close_times = {
                             market_close_times: _context.t0
@@ -18963,7 +18969,7 @@ var onChangeStartDate = exports.onChangeStartDate = function () {
                         obj_duration_min_max = _contract_type2.default.getDurationMinMax(contract_type, contract_start_type);
                         return _context.abrupt('return', _extends({}, obj_contract_start_type, obj_duration_units_list, obj_duration_min_max, obj_duration_unit, obj_sessions, obj_start_time, obj_expiry_date, obj_expiry_time, obj_expiry_type, obj_market_close_times));
 
-                    case 24:
+                    case 25:
                     case 'end':
                         return _context.stop();
                 }
@@ -19703,15 +19709,21 @@ var ContractType = function () {
         return { expiry_type: expiry_type };
     };
 
-    var getExpiryDate = function getExpiryDate(expiry_date, start_date, expiry_type) {
+    var getExpiryDate = function getExpiryDate(duration_units_list, expiry_date, expiry_type, start_date) {
         var proper_expiry_date = null;
 
         if (expiry_type === 'endtime') {
             var moment_start = (0, _Date.toMoment)(start_date);
             var moment_expiry = (0, _Date.toMoment)(expiry_date);
-            // forward starting contracts should only show today and tomorrow as expiry date
-            var is_invalid = moment_expiry.isBefore(moment_start, 'day') || start_date && moment_expiry.isAfter(moment_start.clone().add(1, 'day'));
-            proper_expiry_date = (is_invalid ? moment_start : moment_expiry).format('YYYY-MM-DD');
+
+            if (!(0, _duration.hasIntradayDurationUnit)(duration_units_list)) {
+                var is_invalid = moment_expiry.isSameOrBefore(moment_start, 'day');
+                proper_expiry_date = (is_invalid ? moment_start.clone().add(1, 'day') : moment_expiry).format('YYYY-MM-DD');
+            } else {
+                // forward starting contracts should only show today and tomorrow as expiry date
+                var _is_invalid = moment_expiry.isBefore(moment_start, 'day') || start_date && moment_expiry.isAfter(moment_start.clone().add(1, 'day'));
+                proper_expiry_date = (_is_invalid ? moment_start : moment_expiry).format('YYYY-MM-DD');
+            }
         }
 
         return { expiry_date: proper_expiry_date };
@@ -19888,7 +19900,7 @@ var getDefaultCurrency = exports.getDefaultCurrency = function getDefaultCurrenc
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.convertDurationLimit = exports.getExpiryType = exports.convertDurationUnit = exports.buildDurationConfig = undefined;
+exports.hasIntradayDurationUnit = exports.convertDurationLimit = exports.getExpiryType = exports.convertDurationUnit = exports.buildDurationConfig = undefined;
 
 var _localize = __webpack_require__(/*! ../../../../../_common/localize */ "./src/javascript/_common/localize.js");
 
@@ -19974,12 +19986,13 @@ var getDurationFromString = function getDurationFromString(duration_string) {
 var getExpiryType = exports.getExpiryType = function getExpiryType(store) {
     var duration_unit = store.duration_unit,
         expiry_date = store.expiry_date,
-        expiry_type = store.expiry_type;
+        expiry_type = store.expiry_type,
+        duration_units_list = store.duration_units_list;
 
     var server_time = store.root_store.common.server_time;
 
     var duration_is_day = expiry_type === 'duration' && duration_unit === 'd';
-    var expiry_is_after_today = expiry_type === 'endtime' && (0, _Date.toMoment)(expiry_date).isAfter((0, _Date.toMoment)(server_time), 'day');
+    var expiry_is_after_today = expiry_type === 'endtime' && (0, _Date.toMoment)(expiry_date).isAfter((0, _Date.toMoment)(server_time), 'day') || !hasIntradayDurationUnit(duration_units_list);
 
     var contract_expiry_type = 'daily';
     if (!duration_is_day && !expiry_is_after_today) {
@@ -20006,6 +20019,12 @@ var convertDurationLimit = exports.convertDurationLimit = function convertDurati
     }
 
     return value;
+};
+
+var hasIntradayDurationUnit = exports.hasIntradayDurationUnit = function hasIntradayDurationUnit(duration_units_list) {
+    return duration_units_list.some(function (unit) {
+        return ['m', 'h'].indexOf(unit.value) !== -1;
+    });
 };
 
 /***/ }),
@@ -20105,7 +20124,7 @@ var processTradeParams = exports.processTradeParams = function () {
 
 var getMethodsList = function getMethodsList(store, new_state) {
     return [_contract_type2.default.getContractCategories, ContractType.onChangeContractTypeList].concat(_toConsumableArray(/\b(symbol|contract_type)\b/.test(Object.keys(new_state)) || !store.contract_type ? // symbol/contract_type changed or contract_type not set yet
-    [ContractType.onChangeContractType] : []), [Duration.onChangeExpiry, StartDate.onChangeStartDate]);
+    [ContractType.onChangeContractType] : []), [StartDate.onChangeStartDate, Duration.onChangeExpiry]);
 };
 
 // Some values need to be replaced, not extended
