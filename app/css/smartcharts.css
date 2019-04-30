@@ -1592,6 +1592,9 @@
     .cq-categorical-display .cq-active-item.selected {
       color: #ffffff;
       background: #2a3052; }
+.cq-categorical-display .cq-item.selected .ciq-item-display,
+    .cq-categorical-display .cq-active-item.selected .ciq-item-display {
+      font-weight: bold; }
 .smartcharts-light .cq-categorical-display .cq-item.selected .right .ic-icon svg, .smartcharts-light
     .cq-categorical-display .cq-active-item.selected .right .ic-icon svg {
       fill: #ffffff;
@@ -2623,23 +2626,27 @@ html, body {
 /* -------- Crosshairs lines and labels-------- */
 .stx-float-price,
 .stx-float-date {
-  border-radius: 3px;
   color: #fff; }
 .smartcharts-light .stx-float-price, .smartcharts-light
   .stx-float-date {
     background-color: rgba(127, 131, 151, 0.88); }
 .smartcharts-dark .stx-float-price, .smartcharts-dark
   .stx-float-date {
-    background-color: #555975; }
+    background-color: #2a3052; }
+.stx-float-price {
+  border-radius: 3px; }
 .stx-float-date {
   /* Crosshair Floating x-axis date label*/
   position: absolute;
   font-size: 12px;
   font-family: 'Helvetica';
   z-index: 3;
-  padding: 1px 6px;
+  padding: 3px 6px;
   text-align: center;
-  width: auto; }
+  width: auto;
+  height: 18px;
+  line-height: 18px;
+  font-weight: bold; }
 .stx_crosshair {
   /* Standard Crosshair lines color */
   position: absolute;
@@ -2647,7 +2654,7 @@ html, body {
 .smartcharts-light .stx_crosshair {
     background-color: rgba(127, 131, 151, 0.32); }
 .smartcharts-dark .stx_crosshair {
-    background-color: #ffffff; }
+    background-color: rgba(127, 131, 151, 0.3); }
 .stx_crosshair_drawing {
   /* Crosshairs lines when drawing */
   position: absolute;
@@ -2655,7 +2662,7 @@ html, body {
 .smartcharts-light .stx_crosshair_drawing {
     background-color: rgba(127, 131, 151, 0.32); }
 .smartcharts-dark .stx_crosshair_drawing {
-    background-color: #ffffff; }
+    background-color: rgba(127, 131, 151, 0.3); }
 .crossY, .stx_crosshair_y {
   /* Vertical Crosshair line size */
   left: 0px;
@@ -3859,7 +3866,8 @@ html, body {
       display: block; }
 .stx-crosshair-on .cq-crosshair .cq-crosshair-content .row {
       font-size: 1.2em;
-      line-height: 18px; }
+      line-height: 18px;
+      margin-bottom: 4px; }
 .stx-crosshair-on .cq-crosshair .cq-crosshair-content .row span:first-child {
         padding-right: 5px; }
 .stx-crosshair-on .cq-crosshair .cq-crosshair-content .row span:last-child {
