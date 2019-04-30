@@ -3098,7 +3098,14 @@ html, body {
         color: #ffffff; }
 .smartcharts-dark .cq-spot.cq-endpoint .cq-endpoint-label {
         background-color: #ff9933;
-        color: #2a3052; }
+        color: #ffffff; }
+.closed-chart .cq-spot {
+  -webkit-animation: none;
+          animation: none; }
+.smartcharts-light .closed-chart .cq-spot:before {
+    color: #d6d6d6; }
+.smartcharts-dark .closed-chart .cq-spot:before {
+    color: #303342; }
 @-webkit-keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 153, 51, 0.6); }
