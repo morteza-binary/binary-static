@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.example.morteza.myapplication",
+    "sha256_cert_fingerprints":
+    ["0C:F9:4A:99:17:B8:FC:1E:66:71:0C:76:FD:71:E8:4A:96:93:7A:A2:12:B6:9F:E1:C3:D9:5F:3A:EC:A8:1F:EE"]
+  }
+}]
